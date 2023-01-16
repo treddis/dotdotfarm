@@ -2,11 +2,7 @@ dotdotfarm
 ==========
 Utility for detection & exploitation of Path Traversal vulnerabilities in various network services
 
-dotdotweb - PT tool for web services (HTTP, ~~WebSocket~~)
-
-~~dotdotftp - PT tool for FTP services (FTP, TFTP, FTPS)~~
-
-~~dotdotsmb - PT tool for SMB services~~
+dotdotweb - PT tool for web services (HTTP)
 
 Tools are written in Python with using asyncio requests (aiohttp) with some acceleration techniques, which allows you to make **~3K requests per second**
 
@@ -25,22 +21,6 @@ Passing in GET parameters
 Passing brute parameters via `?par=val` pairs:
 ```commandline
 dotdotweb -o windows "http://someserver.com:1280/newpath?testparameter=FUZZ&secondparameter=somevalue"
-```
-Passing in headers
-------------------
-Passing brute parameters via "Header: value" pairs:
-```commandline
-dotdotweb -o linux -H "Referer: https://someserver.com/FUZZ" "https://somenewserver.org/nepath?query=val"
-```
-~~Passing via POST data~~
----------------------
-Passing brute parameters via sending data in HTTP query:
-```commandline
-dotdotweb -o linux -d "key=value&file=FUZZ" https://testserver.com/checkupdates
-```
-You can also choose multiple brute parameters
-```commandline
-dotdotweb -o linux -d "key=FUZZ&file=FUZZ" -H "Referer: https://someserver.com/FUZZ" "http://someserver.com:1280/newpath?testparameter=FUZZ&secondparameter=somevalue"
 ```
 
 Example output
