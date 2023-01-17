@@ -6,6 +6,7 @@ import asyncio
 import aiohttp
 import yarl
 import time
+import tqdm.asyncio
 from functools import partial
 from colorama import init, Fore, Back, Style
 init()
@@ -41,9 +42,9 @@ async def get_http(session, url, save):
     except asyncio.CancelledError:
         raise
     except aiohttp.client_exceptions.ClientConnectorError:
-        raise
+        return
     except aiohttp.client_exceptions.ServerTimeoutError:
-        raise 
+        return 
     except BaseException:
         raise
 
@@ -56,14 +57,19 @@ async def run_http(urls, save):
     # TODO: make fast & scalable HTTP/S engine in async manner
     # TODO: add Golang transport for speed up networking
     # session_timeout = aiohttp.ClientTimeout(total=None, sock_connect=5, sock_read=5)
+    results = []
     try:
-        async with aiohttp.ClientSession(connector=aiohttp.TCPConnector(
-                limit=1000)) as session:  # speed up requests with increasing simultaneous TCP connections
+        async with aiohttp.ClientSession(
+            connector=aiohttp.TCPConnector(limit=1650)) as session:  # speed up requests with increasing simultaneous TCP connections
+            # print(f'[{Fore.CYAN}*{Style.RESET_ALL}] Generating requests')
             tasks = []
             for url in urls:
                 url = yarl.URL(url, encoded=True)
                 tasks.append(asyncio.create_task(get_http(session, url, save)))
-            results = await asyncio.gather(*tasks) # TODO: fetch all results for future handling
+            # print(f'[{Fore.CYAN}*{Style.RESET_ALL}] Starting event loop')
+            for task in tqdm.asyncio.tqdm.as_completed(tasks):
+                results.append(await task)
+            # results = await asyncio.gather(*tasks) # TODO: fetch all results for future handling
     except asyncio.exceptions.CancelledError:
         pass
     except aiohttp.client_exceptions.ClientConnectorError:
@@ -73,6 +79,7 @@ async def run_http(urls, save):
     finally:
         for task in tasks:
             task.cancel()
+        return results
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='path traversal identificator & exploit')
@@ -112,13 +119,17 @@ if __name__ == '__main__':
     try:
         start = time.time()
         print(f'[{Fore.CYAN}*{Style.RESET_ALL}] Started at {time.ctime(start)}')
-        loop.run_until_complete(task) # TODO: add async tqdm
+        results = []
+        results = loop.run_until_complete(task) # TODO: add async tqdm
     except KeyboardInterrupt:
         print(f'[{Fore.CYAN}*{Style.RESET_ALL}] Got keyboard interrupt')
         task.cancel()
         loop.run_until_complete(task)
     finally:
-        print(f'[{Fore.CYAN}*{Style.RESET_ALL}] Closing event loop')
+        amount = sum(map(lambda x: isinstance(x, aiohttp.ClientResponse) == True, results))
+        if results:
+            print(f'[{Fore.CYAN}*{Style.RESET_ALL}] Amount of responsed queries: ' + \
+                f'{amount} ({round(amount/len(results), 2) * 100})')
         loop.close()
         end = time.time()
 

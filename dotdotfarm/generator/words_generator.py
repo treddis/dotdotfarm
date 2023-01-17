@@ -64,4 +64,5 @@ class Generator:
 		for file in self.files:
 			for dot in self.dots:
 				for slash in self.slashes:
-					yield self.target.replace('FUZZ', (dot + slash + file.replace('|', slash)) * self.depth)
+					for i in range(1, self.depth + 1):
+						yield self.target.replace('FUZZ', (dot + slash) * i + file.replace('|', slash))
