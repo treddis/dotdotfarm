@@ -16,9 +16,9 @@ from generator.words_generator import Generator
 argparse_list = partial(str.split, sep=',')
 
 
-async def get_http(session, url, save):
+async def get_http(session, url, save, headers={}):
     try:
-        async with session.get(url, verify_ssl=False) as response:
+        async with session.get(url, verify_ssl=False, headers=headers) as response:
             text = await response.read()
             if response.status == 200:
                 if len(text) not in opts.fs:
@@ -53,7 +53,7 @@ async def post_http(url, save):
     pass
 
 
-async def run_http(urls, save):
+async def run_http_engine(url, save, headers=None, data=None):
     # TODO: make fast & scalable HTTP/S engine in async manner
     # TODO: add Golang transport for speed up networking
     # session_timeout = aiohttp.ClientTimeout(total=None, sock_connect=5, sock_read=5)
@@ -63,19 +63,24 @@ async def run_http(urls, save):
             connector=aiohttp.TCPConnector(limit=1650)) as session:  # speed up requests with increasing simultaneous TCP connections
             # print(f'[{Fore.CYAN}*{Style.RESET_ALL}] Generating requests')
             tasks = []
-            for url in urls:
+            if type(url) == list:
+                for u in url:
+                    u = yarl.URL(u, encoded=True)
+                    tasks.append(asyncio.create_task(get_http(session, u, save)))
+            else:
                 url = yarl.URL(url, encoded=True)
-                tasks.append(asyncio.create_task(get_http(session, url, save)))
+                for header in headers:
+                    header = dict([header.split(': ')])
+                    tasks.append(asyncio.create_task(get_http(session, url, save, header)))
             # print(f'[{Fore.CYAN}*{Style.RESET_ALL}] Starting event loop')
             for task in tqdm.asyncio.tqdm.as_completed(tasks):
                 results.append(await task)
-            # results = await asyncio.gather(*tasks) # TODO: fetch all results for future handling
     except asyncio.exceptions.CancelledError:
         pass
     except aiohttp.client_exceptions.ClientConnectorError:
-        print(f'[{Fore.RED}-{Style.RESET_ALL}] Host is not available: connection refused') # TODO: disable program shutdown after receiving connection error
+        print(f'[{Fore.RED}-{Style.RESET_ALL}] Host is not available: connection refused') # TODO: add graceful shutdown after many reset errors
     except aiohttp.client_exceptions.ServerTimeoutError:
-        print(f'[{Fore.RED}-{Style.RESET_ALL}] Host is not available: connection timeout') # TODO: disable program shutdown after receiving connection error
+        print(f'[{Fore.RED}-{Style.RESET_ALL}] Host is not available: connection timeout') # TODO: add graceful shutdown after many timeout errors
     finally:
         for task in tasks:
             task.cancel()
@@ -91,28 +96,38 @@ if __name__ == '__main__':
     parser.add_argument('-f', '--filename', help='specific filename for PT detection')
     parser.add_argument('--output-data', action='store_true', help='output contents of harvested files')
     parser.add_argument('-fs', type=argparse_list, default=[], help='filter output by size')
+    parser.add_argument('-fc', type=argparse_list, default=[], help='filter output by response code')
+    parser.add_argument('-H', '--header', nargs='+', help='fuzzing header')
     parser.add_argument('url', help='url for testing')
 
     opts = parser.parse_args() # TODO: fuzz input for robust CLI
     parsed_url = yarl.URL(opts.url)
-    if opts.filename:
-        WINDOWS_FILES = [opts.filename]
-        LINUX_FILES = [opts.filename]
     if opts.fs:
         opts.fs = list(map(int, opts.fs))
-    if opts.url.count('FUZZ') != 1:
+    if opts.header:
+        if len(opts.header) > 1:
+            parser.error('Not implemented')
+        if opts.header[0].count('FUZZ') != 1:
+            parser.error('You must specify FUZZ parameter in header by example Referer: https://google.com/path?param=FUZZ')
+        input_str = opts.header[0]
+    if opts.url.count('FUZZ') != 1 and not opts.header:
         parser.error('You must specify FUZZ parameter in url by example scheme://host:port/path?parameter=FUZZ')
+    elif opts.url.count('FUZZ') == 1:
+        input_str = opts.url
 
     # max_url_size = len(opts.url) + len(max(WINDOWS_FILES if opts.os_type == 'windows' else LINUX_FILES)) + len(
     #     max(DOTS)) * opts.depth + len(max(SLASHES)) * opts.depth
-    
-    generator = Generator(opts.url, opts.depth, opts.os_type) # TODO: make fast & flexible payloads generator in async manner
+
+    generator = Generator(input_str, opts.depth, opts.os_type) # TODO: make fast & flexible payloads generator in async manner
     payloads = generator.get_words()
 
     saves = {} # TODO: make savings better
     loop = asyncio.new_event_loop()
     if yarl.URL(opts.url).scheme in ('http', 'https'):
-        task = loop.create_task(run_http(payloads, saves)) # TODO: use concurrent.futures.ProcessPoolExecutor for speed up
+        if opts.header:
+            task = loop.create_task(run_http_engine(opts.url, saves, payloads))
+        else:
+            task = loop.create_task(run_http_engine(payloads, saves)) # TODO: use concurrent.futures.ProcessPoolExecutor for speed up
     else:
         parser.error('Not implemented')
 
@@ -120,7 +135,7 @@ if __name__ == '__main__':
         start = time.time()
         print(f'[{Fore.CYAN}*{Style.RESET_ALL}] Started at {time.ctime(start)}')
         results = []
-        results = loop.run_until_complete(task) # TODO: add async tqdm
+        results = loop.run_until_complete(task)
     except KeyboardInterrupt:
         print(f'[{Fore.CYAN}*{Style.RESET_ALL}] Got keyboard interrupt')
         task.cancel()

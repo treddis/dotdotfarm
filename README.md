@@ -8,24 +8,31 @@ Tools are written in Python with using asyncio requests (aiohttp) with some acce
 
 Installation
 ============
-```commandline
+```bash
 git clone https://github.com/treddis/dotdotfarm
 cd dotdotfarm
 python setup.py
 ```
 
-Usage
+How to use
 =====
 Passing in GET parameters
 ----------------------
 Passing brute parameters via `?par=val` pairs:
-```commandline
-dotdotweb -o windows "http://someserver.com:1280/newpath?testparameter=FUZZ&secondparameter=somevalue"
+```bash
+dotdotweb -o windows http://someserver.com:1280/newpath?testparameter=FUZZ&secondparameter=somevalue
+```
+
+Passing via headers
+-------------------
+Passing brute parameters via `Origin: master=FUZZ` pairs:
+```bash
+dotdotweb -o linux -H "Referer: https://www.google.com/path?q=FUZZ" http://someserver.com:1280/newpath?testparameter=firstvalue&secondparameter=somevalue
 ```
 
 Example output
 ==============
-```commandline
+```bash
 dotdotweb -o linux "http://localhost:8080/pathtrav?query=FUZZ" 
 [*] Started at Mon Jan 16 00:00:44 2023
 http://localhost:8080/pathtrav?query=..%2f..%2fetc%2fpasswd                                          [Status: 200, Size: 3831]
