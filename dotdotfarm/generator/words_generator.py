@@ -1,6 +1,10 @@
 #!/usr/bin/env python3
 #! -*- coding: utf-8 -*-
 
+from collections import namedtuple
+
+Payload = namedtuple('PAYLOAD', 'type_ value payload')
+
 WINDOWS_FILES = ['Windows|win.ini', 'Windows|System32|drivers|etc|hosts']
 LINUX_FILES = ['etc|passwd', 'etc|issue']
 DOTS = [
@@ -48,8 +52,9 @@ SLASHES = [
 
 class Generator:
 
-	def __init__(self, input_str, depth, os):
-		self.target = input_str
+	def __init__(self, type_, inputs, depth, os):
+		self.type_ = type_
+		self.inputs = inputs
 		self.depth = depth
 		self.slashes = SLASHES
 		self.dots = DOTS
@@ -60,9 +65,20 @@ class Generator:
 		else:
 			raise TypeError
 
-	def get_words(self):
-		for file in self.files:
-			for dot in self.dots:
-				for slash in self.slashes:
-					for i in range(1, self.depth + 1):
-						yield self.target.replace('FUZZ', (dot + slash) * i + file.replace('|', slash))
+		if self.type_ == 'http':
+			self.get_payloads = self.get_payloads_http
+
+	# def get_payloads(self):
+	# 	if self.type_ == 'http':
+	# 		yield self.get_payloads_http()
+
+	def get_payloads_http(self):
+		for type_, inp_list in self.inputs.items():
+			for file in self.files:
+				for dot in self.dots:
+					for slash in self.slashes:
+						for i in range(1, self.depth + 1):
+							for input_ in inp_list:
+								payload = (dot + slash) * i + file.replace('|', slash)
+								fuzzed = input_.replace('FUZZ', payload)
+								yield Payload(type_, fuzzed, payload)
