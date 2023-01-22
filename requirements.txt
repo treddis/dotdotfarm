@@ -1,6 +1,6 @@
 aiohttp==3.8.3
 colorama==0.4.6
-setuptools==39.0.1
+setuptools==66.1.1
 tqdm==4.64.1
 yarl==1.8.2
 multidict==6.0.4

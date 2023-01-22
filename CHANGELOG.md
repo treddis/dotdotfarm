@@ -1,8 +1,14 @@
 # Change log
 All notable changes to this project will be documented in this file
 
+## [[1.1.0] - 2023-01-22] ALPHA
+### Added
+- limitations of the tool to README
+### Fixed
+- typo in README
+
 ## [[1.0.0] - 2023-01-22] ALPHA
-## Added
+### Added
 - support of setup.py
 - project as package
 - callbacks for requests
