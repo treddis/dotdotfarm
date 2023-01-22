@@ -11,6 +11,7 @@ Installation
 ```bash
 git clone https://github.com/treddis/dotdotfarm
 cd dotdotfarm
+pip install -r requirements.txt
 python setup.py
 ```
 
