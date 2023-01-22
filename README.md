@@ -2,7 +2,7 @@ dotdotfarm
 ==========
 Utility for detection & exploitation of Path Traversal vulnerabilities in various network services
 
-dotdotweb - PT tool for web services (HTTP)
+dotdotweb - PT tool for web services (HTTP) (Alpha version)
 
 Tools are written in Python with using asyncio requests (aiohttp) with some acceleration techniques, which allows you to make **~3K requests per second**
 
@@ -28,6 +28,13 @@ Passing via headers
 Passing brute parameters via `Origin: master=FUZZ` pairs:
 ```bash
 dotdotweb -o linux -H "Referer: https://www.google.com/path?q=FUZZ" http://someserver.com:1280/newpath?testparameter=firstvalue&secondparameter=somevalue
+```
+
+Passing via POST data
+---------------------
+Passing brute parameters via POST data parameters
+```bash
+dotdotweb -o linux -H "key0=val0&key1=val1" http://someserver.com:1280/newpath?testparameter=firstvalue&secondparameter=somevalue
 ```
 
 Example output

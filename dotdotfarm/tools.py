@@ -4,7 +4,7 @@
 """ Usefool tools for project """
 
 from colorama import Fore, Style
-from engines.http_engine import HttpResponse
+from dotdotfarm.engines.http_engine import HttpResponse
 
 def print_http_result(future):
 	result = future.result()

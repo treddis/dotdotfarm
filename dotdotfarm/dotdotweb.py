@@ -11,14 +11,14 @@ from functools import partial
 from colorama import init, Fore, Back, Style
 init()
 
-from generator.words_generator import Generator
-from engines.http_engine import HTTPEngine
-from tools import print_http_result
+from dotdotfarm.generator.words_generator import Generator
+from dotdotfarm.engines.http_engine import HTTPEngine
+from dotdotfarm.tools import print_http_result
 
 argparse_list = partial(str.split, sep=',')
 
 
-async def main(engine):
+async def factory(engine):
     # TODO: add Golang transport for speed up networking    
     try:
         task = asyncio.create_task(engine.run())
@@ -38,7 +38,7 @@ async def main(engine):
     #         print(f'[{Fore.CYAN}*{Style.RESET_ALL}] Amount of responsed queries: ' + \
     #             f'{amount} ({round(amount/len(results), 2) * 100})')
 
-if __name__ == '__main__':
+def main():
     parser = argparse.ArgumentParser(description='path traversal identificator & exploit')
     parser.add_argument('-v', '--verbose', action='store_true', help='verbose output')
     # parser.add_argument('-M', '--module-detect', action='store_true', default=False, help='intelligent service detection')
@@ -104,7 +104,7 @@ if __name__ == '__main__':
             print_callback=print_http_result,
             filters=(opts.fc, opts.fs))
 
-        task = loop.create_task(main(engine)) # TODO: use concurrent.futures.ProcessPoolExecutor for speed up
+        task = loop.create_task(factory(engine)) # TODO: use concurrent.futures.ProcessPoolExecutor for speed up
     else:
         parser.error('Not implemented')
 
@@ -124,3 +124,6 @@ if __name__ == '__main__':
             for k, v in saves.items():
                 print(f'\t{k}\n{v}\n\n')
         print(f'[{Fore.CYAN}*{Style.RESET_ALL}] Ended at {time.ctime(end)} ({int(end - start)} seconds)')
+
+if __name__ == '__main__':
+    main()

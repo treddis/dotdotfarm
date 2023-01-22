@@ -16,7 +16,7 @@ class HTTPEngine:
 		requests_limit=0,
 		status_manager=tqdm.asyncio.tqdm,
 		allow_redirects=False,
-		verify_ssl=True,
+		verify_ssl=False,
 		print_callback=None,
 		filters=None):
 		self.url = url
@@ -61,7 +61,7 @@ class HTTPEngine:
 							asyncio.create_task(
 								self.request(
 									session, self.method, self.url, self.headers, payload.value, payload.payload)))
-					self.tasks[-1].add_done_callback(self.print_callback)
+					self.tasks[-1].add_done_callback(self.print_callback)	# add callback passed via __init__
 
 				# for task in self.status_wrapped(self.tasks, ascii=True, position=35):
 				# 	await self.oqueue.put(await task) # !!!

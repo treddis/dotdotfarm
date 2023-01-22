@@ -1,6 +1,12 @@
 # Change log
 All notable changes to this project will be documented in this file
 
+## [[1.0.0] - 2023-01-22] ALPHA
+## Added
+- support of setup.py
+- project as package
+- callbacks for requests
+
 ## [[0.3.0] - 2023-01-18] BETA
 ### Added
 - support for attacks via HTTP headers
