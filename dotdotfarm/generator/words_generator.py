@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 #! -*- coding: utf-8 -*-
 
+import re
 from collections import namedtuple
 
 Payload = namedtuple('PAYLOAD', 'type_ value payload')
@@ -52,13 +53,16 @@ SLASHES = [
 
 class Generator:
 
-	def __init__(self, type_, inputs, depth, os):
+	def __init__(self, type_, inputs, depth, os,
+		custom_file=None):
 		self.type_ = type_
 		self.inputs = inputs
 		self.depth = depth
 		self.slashes = SLASHES
 		self.dots = DOTS
-		if os == 'windows':
+		if custom_file:
+			self.files = [re.sub(r'[\\|/]', '|', custom_file)]
+		elif os == 'windows':
 			self.files = WINDOWS_FILES
 		elif os == 'posix' or os == 'linux':
 			self.files = LINUX_FILES

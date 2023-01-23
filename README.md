@@ -6,6 +6,13 @@ dotdotweb - PT tool for web services (HTTP) (Alpha version)
 
 Tools are written in Python with using asyncio requests (aiohttp) with some acceleration techniques, which allows you to make **~3K requests per second**
 
+Features
+========
+- async client for parallel requesting of target (speedup)
+- increasing simultaneous connections in the TCP connector (speedup)
+- ability to fetch files' content after succeeding payload
+- specifying payload in any part of query (url, headers or POST data)
+
 Installation
 ============
 ```bash
@@ -76,5 +83,5 @@ Limitations
 - Python 3.8+
 - High speed of requests rate can trigger WAF of you target
 - Unable to pass own dictionary for payload generator
-- No way to flexibly forge payloaded requests
+- No way to flexibly forge payloads
 - Need of OS specifying

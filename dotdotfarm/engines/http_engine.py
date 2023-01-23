@@ -6,7 +6,7 @@ import aiohttp
 import tqdm.auto
 from collections import namedtuple
 
-HttpResponse = namedtuple('HTTP_RESPONSE', 'url status headers text payload')
+HttpResponse = namedtuple('HTTP_RESPONSE', 'url status headers data payload')
 
 
 class HTTPEngine:
@@ -17,7 +17,7 @@ class HTTPEngine:
 		status_manager=tqdm.asyncio.tqdm,
 		allow_redirects=False,
 		verify_ssl=False,
-		print_callback=None,
+		callbacks=[],
 		filters=None):
 		self.url = url
 		self.method = method
@@ -28,7 +28,7 @@ class HTTPEngine:
 		self.status_manager = status_manager
 		self.allow_redirects = allow_redirects
 		self.verify_ssl = verify_ssl
-		self.print_callback = print_callback
+		self.callbacks = callbacks
 
 		self.fc = filters[0]
 		self.fs = filters[1]
@@ -61,11 +61,12 @@ class HTTPEngine:
 							asyncio.create_task(
 								self.request(
 									session, 'post', self.url, self.headers, payload.value, payload.payload)))
-					self.tasks[-1].add_done_callback(self.print_callback)	# add callback passed via __init__
+					for callback in self.callbacks:
+						self.tasks[-1].add_done_callback(callback)	# add callback passed via __init__
 
-				# for task in self.status_wrapped(self.tasks, ascii=True, position=35):
-				# 	await self.oqueue.put(await task) # !!!
-				await asyncio.gather(*self.tasks)
+				for task in self.status_wrapped(self.tasks):
+					await task # !!!
+				# await asyncio.gather(*self.tasks)
 
 		except asyncio.CancelledError:
 			return
@@ -102,5 +103,5 @@ class HTTPEngine:
 
 		# while (response := await self.oqueue.get()) != None:
 		# 	# text = await response.text.read()
-		if response.status not in self.fc and len(response.text) not in self.fs:
+		if response.status not in self.fc and len(response.data) not in self.fs:
 			return response

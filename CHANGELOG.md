@@ -1,6 +1,12 @@
 # Change log
 All notable changes to this project will be documented in this file
 
+## [[1.2.0] - 2023-01-23] ALPHA
+### Added
+- Features to README
+- Fixed TQDM status bar
+- Reading of files after succeeding the payload
+
 ## [[1.1.0] - 2023-01-22] ALPHA
 ### Added
 - limitations of the tool to README

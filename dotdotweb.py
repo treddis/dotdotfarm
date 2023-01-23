@@ -13,7 +13,7 @@ init()
 
 from dotdotfarm.generator.words_generator import Generator
 from dotdotfarm.engines.http_engine import HTTPEngine
-from dotdotfarm.tools import print_http_result
+from dotdotfarm.tools import print_http_result, get_add_file
 
 argparse_list = partial(str.split, sep=',')
 
@@ -39,14 +39,23 @@ async def factory(engine):
     #             f'{amount} ({round(amount/len(results), 2) * 100})')
 
 def main():
+    print(f"""{Fore.CYAN}
+    .___      __      .___      __    {Fore.RED}_____                      
+  {Fore.CYAN}__| _/{Fore.YELLOW}____{Fore.CYAN}_/  |_  __| _/{Fore.YELLOW}____{Fore.CYAN}_/  |__{Fore.RED}/ ____\\____ _______  _____  
+ {Fore.CYAN}/ __ |{Fore.YELLOW}/  _ \\{Fore.CYAN}   __\\/ __ |{Fore.YELLOW}/  _ \\{Fore.CYAN}   __{Fore.RED}\\   __\\\\__  \\\\_  __ \\/     \\ 
+{Fore.CYAN}/ /_/ {Fore.YELLOW}(  <_> ){Fore.CYAN}  | / /_/ {Fore.YELLOW}(  <_> ){Fore.CYAN}  |  {Fore.RED}|  |   / __ \\|  | \\/  Y Y  \\
+{Fore.CYAN}\\____ |{Fore.YELLOW}\\____/{Fore.CYAN}|__| \\____ |{Fore.YELLOW}\\____/{Fore.CYAN}|__|  {Fore.RED}|__|  (____  /__|  |__|_|  /
+     {Fore.CYAN}\\/                \\/                       {Fore.RED}\\/            \\/ 
+     {Style.RESET_ALL}""")
+
     parser = argparse.ArgumentParser(description='path traversal identificator & exploit')
-    parser.add_argument('-v', '--verbose', action='store_true', help='verbose output')
+    # parser.add_argument('-v', '--verbose', action='store_true', help='verbose output')
     # parser.add_argument('-M', '--module-detect', action='store_true', default=False, help='intelligent service detection')
     parser.add_argument('-o', '--os-type', required=True, choices=['windows', 'linux'])
     # parser.add_argument('-O', '--os-detect', action='store_true', default=False, help='intelligent OS detection') # TODO: add OS detection mechanisms
     parser.add_argument('-D', '--depth', type=int, default=4, help='depth of PT searching')
-    parser.add_argument('-f', '--filename', help='specific filename for PT detection')
-    parser.add_argument('--output-data', action='store_true', help='output contents of harvested files')
+    parser.add_argument('-f', '--file', help='specific file for PT detection')
+    parser.add_argument('-R', '--print-files', action='store_true', help='read traversed files')
     parser.add_argument('-fs', type=argparse_list, default=[], help='filter output by size')
     parser.add_argument('-fc', type=argparse_list, default=[], help='filter output by response code')
     parser.add_argument('-H', '--header', dest='headers', default=[], action='append', help='specify header for requests')
@@ -89,7 +98,7 @@ def main():
     # max_url_size = len(opts.url) + len(max(WINDOWS_FILES if opts.os_type == 'windows' else LINUX_FILES)) + len(
     #     max(DOTS)) * opts.depth + len(max(SLASHES)) * opts.depth
 
-    generator = Generator('http', inputs, opts.depth, opts.os_type)
+    generator = Generator('http', inputs, opts.depth, opts.os_type, custom_file=opts.file)
     payloads = generator.get_payloads()
 
     # saves = {} # TODO: make savings better
@@ -97,11 +106,15 @@ def main():
     if yarl.URL(opts.url).scheme in ('http', 'https'):
         headers = dict((header.split(': ') for header in opts.headers if header.count('FUZZ') == 0))
 
+        callbacks = [print_http_result]
+        if opts.print_files:
+            files = {}
+            callbacks.append(get_add_file(files))
         engine = HTTPEngine(
             opts.url, opts.method,
             headers, opts.data,
             payloads,
-            print_callback=print_http_result,
+            callbacks=callbacks,
             filters=(opts.fc, opts.fs))
 
         task = loop.create_task(factory(engine)) # TODO: use concurrent.futures.ProcessPoolExecutor for speed up
@@ -120,9 +133,9 @@ def main():
         loop.close()
         end = time.time()
 
-        if opts.output_data:
-            for k, v in saves.items():
-                print(f'\t{k}\n{v}\n\n')
+        if opts.print_files:
+            for k, v in files.items():
+                print('\n\n\t' + f'{Fore.YELLOW}-{Fore.RED}+' * 10 + f'{Style.RESET_ALL}' + k + f'{Fore.RED}+{Fore.YELLOW}-' * 10 + '\n' + f'{Style.RESET_ALL}\n{v}\n\t' + f'{Fore.YELLOW}-{Fore.RED}+' * 70 + f'{Fore.YELLOW}-{Style.RESET_ALL}')
         print(f'[{Fore.CYAN}*{Style.RESET_ALL}] Ended at {time.ctime(end)} ({int(end - start)} seconds)')
 
 if __name__ == '__main__':
