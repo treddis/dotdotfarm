@@ -11,7 +11,7 @@ from functools import partial
 from colorama import init, Fore, Back, Style
 init()
 
-from dotdotfarm.generator.words_generator import Generator
+from dotdotfarm.generators.words_generator import Generator
 from dotdotfarm.engines.http_engine import HTTPEngine
 from dotdotfarm.tools import print_http_result, get_add_file
 
@@ -51,9 +51,10 @@ def main():
     parser = argparse.ArgumentParser(description='path traversal identificator & exploit')
     # parser.add_argument('-v', '--verbose', action='store_true', help='verbose output')
     # parser.add_argument('-M', '--module-detect', action='store_true', default=False, help='intelligent service detection')
-    parser.add_argument('-o', '--os-type', required=True, choices=['windows', 'linux'])
+    parser.add_argument('-o', '--os-type', choices=['windows', 'linux'], default='')
     # parser.add_argument('-O', '--os-detect', action='store_true', default=False, help='intelligent OS detection') # TODO: add OS detection mechanisms
     parser.add_argument('-D', '--depth', type=int, default=4, help='depth of PT searching')
+    parser.add_argument('-t', '--timeout', type=int, default=60, help='timeout of connections')
     parser.add_argument('-f', '--file', help='specific file for PT detection')
     parser.add_argument('-R', '--print-files', action='store_true', help='read traversed files')
     parser.add_argument('-fs', type=argparse_list, default=[], help='filter output by size')
@@ -115,7 +116,8 @@ def main():
             headers, opts.data,
             payloads,
             callbacks=callbacks,
-            filters=(opts.fc, opts.fs))
+            filters=(opts.fc, opts.fs),
+            timeout=opts.timeout)
 
         task = loop.create_task(factory(engine)) # TODO: use concurrent.futures.ProcessPoolExecutor for speed up
     else:

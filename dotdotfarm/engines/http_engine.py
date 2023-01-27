@@ -17,6 +17,7 @@ class HTTPEngine:
 		status_manager=tqdm.asyncio.tqdm,
 		allow_redirects=False,
 		verify_ssl=False,
+		timeout=60,
 		callbacks=[],
 		filters=None):
 		self.url = url
@@ -29,6 +30,7 @@ class HTTPEngine:
 		self.allow_redirects = allow_redirects
 		self.verify_ssl = verify_ssl
 		self.callbacks = callbacks
+		self.timeout = timeout
 
 		self.fc = filters[0]
 		self.fs = filters[1]
@@ -65,7 +67,7 @@ class HTTPEngine:
 						self.tasks[-1].add_done_callback(callback)	# add callback passed via __init__
 
 				for task in self.status_wrapped(self.tasks):
-					await task # !!!
+					await task
 				# await asyncio.gather(*self.tasks)
 
 		except asyncio.CancelledError:
@@ -84,7 +86,8 @@ class HTTPEngine:
 			async with session.request(method, url,
 				headers=headers, data=data,
 				verify_ssl=self.verify_ssl,
-				allow_redirects=self.allow_redirects) as response:
+				allow_redirects=self.allow_redirects,
+				timeout=self.timeout) as response:
 				text = await response.read()
 				resp = HttpResponse(url, response.status, response.headers, text, used_payload)
 		except asyncio.CancelledError:

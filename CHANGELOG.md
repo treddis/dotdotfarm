@@ -1,6 +1,14 @@
 # Change log
 All notable changes to this project will be documented in this file
 
+## [[1.3.0] - 2023-01-27] ALPHA
+### Added
+- testing of all available files for windows and linux by default, thus closing the limitation of OS type requirement
+- added a default timeout of 60 seconds
+### Fixed
+- README typo
+- project tree
+
 ## [[1.2.0] - 2023-01-23] ALPHA
 ### Added
 - Features to README

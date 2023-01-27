@@ -67,7 +67,7 @@ class Generator:
 		elif os == 'posix' or os == 'linux':
 			self.files = LINUX_FILES
 		else:
-			raise TypeError
+			self.files = LINUX_FILES + WINDOWS_FILES
 
 		if self.type_ == 'http':
 			self.get_payloads = self.get_payloads_http
