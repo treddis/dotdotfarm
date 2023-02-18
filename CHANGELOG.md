@@ -1,7 +1,17 @@
 # Change log
 All notable changes to this project will be documented in this file
 
-## [[1.3.0] - 2023-01-27] ALPHA
+## [[1.4.0] - 2023-02-13]
+## Added
+- version via --version parameter
+- version to README
+- specifying of depth for generator
+- specifying max depth of PT for generator
+- preparations for callbacks
+## Fixed
+- typo in README & CHANGELOG
+
+## [[1.3.0] - 2023-01-27] BETA
 ### Added
 - testing of all available files for windows and linux by default, thus closing the limitation of OS type requirement
 - added a default timeout of 60 seconds
@@ -9,25 +19,25 @@ All notable changes to this project will be documented in this file
 - README typo
 - project tree
 
-## [[1.2.0] - 2023-01-23] ALPHA
+## [[1.2.0] - 2023-01-23] BETA
 ### Added
 - Features to README
 - Fixed TQDM status bar
 - Reading of files after succeeding the payload
 
-## [[1.1.0] - 2023-01-22] ALPHA
+## [[1.1.0] - 2023-01-22] BETA
 ### Added
 - limitations of the tool to README
 ### Fixed
 - typo in README
 
-## [[1.0.0] - 2023-01-22] ALPHA
+## [[1.0.0] - 2023-01-22] BETA
 ### Added
 - support of setup.py
 - project as package
 - callbacks for requests
 
-## [[0.3.0] - 2023-01-18] BETA
+## [[0.3.0] - 2023-01-18] ALPHA
 ### Added
 - support for attacks via HTTP headers
 - status bar (tqdm) for monitoring results
@@ -35,7 +45,7 @@ All notable changes to this project will be documented in this file
 ### Fixed
 - invalid handling of input for payloads generator
 
-## [[0.2.0] - 2023-01-17] BETA
+## [[0.2.0] - 2023-01-17] ALPHA
 ### Added
 - first view of project structure
 - TODO comments
@@ -48,9 +58,9 @@ All notable changes to this project will be documented in this file
 ### Fixed
 - added handlers for graceful shutdown of coroutins after receiving reset&timeout errors
 
-## [[0.1.1] - 2023-01-16] BETA
+## [[0.1.1] - 2023-01-16] ALPHA
 ### Fixed
 - updating README
 
-## [[0.1.0] - 2023-01-16] BETA
+## [[0.1.0] - 2023-01-16] ALPHA
 - initial commit
