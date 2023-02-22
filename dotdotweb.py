@@ -3,19 +3,17 @@
 
 import argparse
 import asyncio
-import aiohttp
 import yarl
 import time
-import tqdm.asyncio
 from functools import partial
-from colorama import init, Fore, Back, Style
+from colorama import init, Fore, Style
 init()
 
 from dotdotfarm.generators.words_generator import Generator
 from dotdotfarm.engines.http_engine import HTTPEngine
 from dotdotfarm.callbacks.callbacks import print_http_result, get_add_file
 
-VERSION = "1.4.0"
+VERSION = "1.4.1"
 
 argparse_list = partial(str.split, sep=',')
 
@@ -23,20 +21,10 @@ async def factory(engine):
     try:
         task = asyncio.create_task(engine.run())
         await task
-        # results = []
-        # async for result in engine.filtered_results(fc, fs):
-        #     # print('{:<100}{:>20}'.format(result.payload, # TODO: add more informative output
-        #     #                                      f' [Status: {Fore.GREEN}{result.status}{Style.RESET_ALL}, Size: {len(result.text)}]'))
-        #     results.append(result)
     except asyncio.CancelledError:
         task.cancel()
     except ConnectionResetError:
         pass
-    # else:
-    #     amount = sum(map(lambda x: x.status == 200, results))
-    #     if results:
-    #         print(f'[{Fore.CYAN}*{Style.RESET_ALL}] Amount of responsed queries: ' + \
-    #             f'{amount} ({round(amount/len(results), 2) * 100})')
 
 def main():
     print(f"""{Fore.CYAN}
@@ -77,16 +65,6 @@ def main():
     elif not opts.method:
         opts.method = 'get'
 
-    # match 'FUZZ':
-    #     case opts.url:
-    #         pass
-    #     case opts.header:
-    #         pass
-    #     case opts.data:
-    #         pass
-    #     case _:
-    #         parser.error('You must specify FUZZ parameter in URL/Header/Data by example Referer: https://google.com/path?param=FUZZ')
-
     if 'FUZZ' not in opts.url and 'FUZZ' not in opts.data and not any(map(lambda x: 'FUZZ' in x, opts.headers)):
         parser.error('You must specify FUZZ parameter in URL/Header/Data by example Referer: https://google.com/path?param=FUZZ')
     inputs = {}
@@ -101,13 +79,9 @@ def main():
             else:
                 inputs['header'] = [header]
 
-    # max_url_size = len(opts.url) + len(max(WINDOWS_FILES if opts.os_type == 'windows' else LINUX_FILES)) + len(
-    #     max(DOTS)) * opts.depth + len(max(SLASHES)) * opts.depth
-
     generator = Generator('http', inputs, opts.depth, opts.os_type, custom_file=opts.file)
     payloads = generator.get_payloads()
 
-    # saves = {} # TODO: make savings better
     loop = asyncio.new_event_loop()
     if yarl.URL(opts.url).scheme in ('http', 'https'):
         headers = dict((header.split(': ') for header in opts.headers if header.count('FUZZ') == 0))

@@ -1,14 +1,19 @@
 # Change log
 All notable changes to this project will be documented in this file
 
-## [[1.4.0] - 2023-02-13]
-## Added
+## [[1.4.1] - 2023-02-22]
+### Fixed
+- entry point in setup.py
+- valid structure of callbacks module
+
+## [[1.4.0] - 2023-02-18]
+### Added
 - version via --version parameter
 - version to README
 - specifying of depth for generator
 - specifying max depth of PT for generator
 - preparations for callbacks
-## Fixed
+### Fixed
 - typo in README & CHANGELOG
 
 ## [[1.3.0] - 2023-01-27] BETA
