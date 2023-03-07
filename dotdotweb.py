@@ -2,6 +2,7 @@
 #! -*- coding: utf-8 -*-
 
 import argparse
+import logging
 import asyncio
 import yarl
 import time
@@ -11,7 +12,7 @@ init()
 
 from dotdotfarm.generators.words_generator import Generator
 from dotdotfarm.engines.http_engine import HTTPEngine
-from dotdotfarm.callbacks.callbacks import print_http_result, get_add_file
+from dotdotfarm.callbacks.callbacks import print_http_result, add_file, validate_file
 
 VERSION = "1.4.1"
 
@@ -24,6 +25,8 @@ async def factory(engine):
     except asyncio.CancelledError:
         task.cancel()
     except ConnectionResetError:
+        pass
+    except BaseException:
         pass
 
 def main():
@@ -38,23 +41,24 @@ def main():
 
     parser = argparse.ArgumentParser(description='path traversal identificator & exploit')
     parser.add_argument('-V', '--version', action='version', version=f'dotdotweb {VERSION}', help='print version of the tool')
-    # parser.add_argument('-v', '--verbose', action='store_true', help='verbose output')
+    parser.add_argument('--debug', action='store_true', help='debug output')
     # parser.add_argument('-M', '--module-detect', action='store_true', default=False, help='intelligent service detection')
     parser.add_argument('-o', '--os-type', choices=['windows', 'linux'], default='')
     # parser.add_argument('-O', '--os-detect', action='store_true', default=False, help='intelligent OS detection') # TODO: add OS detection mechanisms
-    parser.add_argument('-D', '--depth', type=int, default=5, help='depth of PT searching, default 5')
-    parser.add_argument('-t', '--timeout', type=int, default=60, help='timeout of connections')
+    parser.add_argument('-D', '--depth', type=int, default=5, help='depth of PT searching, default is 5')
+    parser.add_argument('--timeout', type=int, default=60, help='timeout of connections')
     parser.add_argument('-f', '--file', help='specific file for PT detection')
     parser.add_argument('-R', '--print-files', action='store_true', help='read traversed files')
     parser.add_argument('-fs', type=argparse_list, default=[], help='filter output by size')
     parser.add_argument('-fc', type=argparse_list, default=[], help='filter output by response code')
     parser.add_argument('-H', '--header', dest='headers', default=[], action='append', help='specify header for requests')
     parser.add_argument('-d', '--data', default='', help='specify POST data')
-    parser.add_argument('-m', '--method', choices=['get', 'post', 'put', 'trace', 'delete'], default='',
-        help='used HTTP method for requests')
+    parser.add_argument('-m', '--method', choices=['get', 'post', 'put', 'trace', 'delete'], default='', help='used HTTP method for requests')
     parser.add_argument('url', help='url for testing')
 
-    opts = parser.parse_args() # TODO: fuzz input for robust CLI
+    opts = parser.parse_args()
+    if opts.debug:
+        logging.getLogger("asyncio").setLevel(logging.WARNING)
 
     if opts.fs:
         opts.fs = list(map(int, opts.fs))
@@ -86,10 +90,10 @@ def main():
     if yarl.URL(opts.url).scheme in ('http', 'https'):
         headers = dict((header.split(': ') for header in opts.headers if header.count('FUZZ') == 0))
 
-        callbacks = [print_http_result]
+        callbacks = [print_http_result, validate_file]
         if opts.print_files:
             files = {}
-            callbacks.append(get_add_file(files))
+            callbacks.append(add_file(files))
         engine = HTTPEngine(
             opts.url, opts.method,
             headers, opts.data,
@@ -107,7 +111,7 @@ def main():
         print(f'[{Fore.CYAN}*{Style.RESET_ALL}] Started at {time.ctime(start)}')
         loop.run_until_complete(task)
     except KeyboardInterrupt:
-        print(f'[{Fore.CYAN}*{Style.RESET_ALL}] Got keyboard interrupt')
+        print(f'\n[{Fore.CYAN}*{Style.RESET_ALL}] Got keyboard interrupt')
         task.cancel()
         loop.run_until_complete(task)
     finally:
@@ -116,7 +120,7 @@ def main():
 
         if opts.print_files:
             for k, v in files.items():
-                print('\n\n\t' + f'{Fore.YELLOW}-{Fore.RED}+' * 10 + f'{Style.RESET_ALL}' + k + f'{Fore.RED}+{Fore.YELLOW}-' * 10 + '\n' + f'{Style.RESET_ALL}\n{v}\n\t' + f'{Fore.YELLOW}-{Fore.RED}+' * 70 + f'{Fore.YELLOW}-{Style.RESET_ALL}')
+                print('\n\n\t' + f'{Fore.YELLOW}-{Fore.RED}+' * 10 + f'{Style.RESET_ALL} ' + k + f' {Fore.RED}+{Fore.YELLOW}-' * 10 + '\n' + f'{Style.RESET_ALL}\n{v}\n\t' + f'{Fore.YELLOW}-{Fore.RED}+' * 70 + f'{Fore.YELLOW}-{Style.RESET_ALL}')
         print(f'[{Fore.CYAN}*{Style.RESET_ALL}] Ended at {time.ctime(end)} ({int(end - start)} seconds)')
 
 if __name__ == '__main__':

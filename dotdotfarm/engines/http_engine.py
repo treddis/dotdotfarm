@@ -7,6 +7,9 @@ import tqdm.auto
 import yarl
 from collections import namedtuple
 
+import dotdotfarm.callbacks.cobject
+
+HttpQuery = namedtuple('HTTP_QUERY', 'type_ value payload')
 HttpResponse = namedtuple('HTTP_RESPONSE', 'url status headers data payload')
 
 
@@ -14,7 +17,6 @@ class HTTPEngine:
 
 	def __init__(self, url, method, headers, data, payloads,
 		limit=1000,
-		requests_limit=0,
 		status_manager=tqdm.asyncio.tqdm,
 		allow_redirects=False,
 		verify_ssl=False,
@@ -47,7 +49,7 @@ class HTTPEngine:
 	async def run(self):
 		try:
 			async with aiohttp.ClientSession(
-				connector=aiohttp.TCPConnector(limit=self.limit)) as session:	# accelerator
+				connector=aiohttp.TCPConnector(limit=self.limit)) as session:
 				for payload in self.payloads:
 					if payload.type_ == 'url':
 						self.tasks.append(
@@ -65,22 +67,18 @@ class HTTPEngine:
 								self.request(
 									session, 'post', self.url, self.headers, payload.value, payload.payload)))
 					for callback in self.callbacks:
-						self.tasks[-1].add_done_callback(callback)	# add callback passed via __init__
+						self.tasks[-1].add_done_callback(callback)
 
 				for task in self.status_wrapped(self.tasks):
 					await task
-				# await asyncio.gather(*self.tasks)
 
 		except asyncio.CancelledError:
-			return
+			for task in self.tasks:
+				task.cancel()
 		except ConnectionResetError:
 			return
 		except BaseException:
 			return
-		finally:
-			for task in self.tasks:
-				task.cancel()
-			# self.oqueue.task_done()
 
 	async def request(self, session, method, url, headers, data, used_payload):
 		url = yarl.URL(url, encoded=True)
@@ -91,14 +89,17 @@ class HTTPEngine:
 				allow_redirects=self.allow_redirects,
 				timeout=self.timeout) as response:
 				text = await response.read()
+				url = str(url)
 				resp = HttpResponse(url, response.status, response.headers, text, used_payload)
-		except asyncio.CancelledError:
-			return
+		except (
+				asyncio.CancelledError,
+				asyncio.TimeoutError,
+				aiohttp.client_exceptions.ClientConnectorError,
+				aiohttp.ClientOSError,
+				aiohttp.ServerDisconnectedError,
+				):
+			return HttpResponse(url, None, None, None, None)
 		except ConnectionResetError:
-			return
-		except asyncio.TimeoutError:
-			return
-		except aiohttp.client_exceptions.ClientConnectorError:
 			return
 		except BaseException:
 			return
@@ -108,10 +109,8 @@ class HTTPEngine:
 	def filtered(self, response):
 		""" Filters response based on user rules """
 
-		# while (response := await self.oqueue.get()) != None:
-		# 	# text = await response.text.read()
 		try:
 			if response.status not in self.fc and len(response.data) not in self.fs:
-				return response
-		except ConnectionResetError:
-			pass
+				return dotdotfarm.callbacks.cobject.CallbackObject(response)  # return response from engine as callback-chain object
+		except BaseException:
+			return
