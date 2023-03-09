@@ -6,7 +6,6 @@ Utility for detection & exploitation of Path Traversal vulnerabilities in variou
 
 dotdotweb - PT tool for HTTP services
 
-dotdotws - PT tool for WebSocket services
 
 Tools are written in Python with using asyncio requests (aiohttp) with some acceleration techniques, which allows you to make **~3K requests per second**
 

@@ -3,7 +3,6 @@
 
 import re
 from dotdotfarm.engines.http_engine import HttpQuery
-from dotdotfarm.engines.websock_engine import WsQuery
 
 # Payload = namedtuple('PAYLOAD', 'type_ value payload')
 

@@ -7,7 +7,6 @@ from tqdm import tqdm
 
 import dotdotfarm.engines.http_engine
 import dotdotfarm.generators.words_generator
-from dotdotfarm.engines.websock_engine import WsResponse
 from dotdotfarm.callbacks.cobject import Failed
 
 
@@ -24,23 +23,6 @@ def print_http_result(future):
         # tqdm.write('{:<10}'.format(f'{Fore.RED}ERROR{Style.RESET_ALL}'))
         return
 
-def print_ws_result(future):
-    """ Basic callback for printing result of request. """
-    try:
-        cobject = future.result()
-        if cobject.state == Failed:
-            return
-        if type(cobject.response) == WsResponse:
-            for payload in cobject.payload:
-                pass
-            tqdm.write(' {:<100}{:>20}'.format(cobject.payload,
-                                               f' [Status: {Fore.GREEN}OK{Style.RESET_ALL}, Size: {len(cobject.data)}]'))
-        elif type(cobject) is Exception:
-            tqdm.write(' {:<100}{:>20}'.format(cobject.payload,
-                                               f' [Status: {Fore.GREEN}OK{Style.RESET_ALL}, Size: {len(cobject.data)}]'))
-    except:
-        # tqdm.write(' {:<100}{:>20}'.format(f'{Fore.RED}ERROR{Style.RESET_ALL}'))
-        return
 
 def validate_file(future):
     """ This callback is used for checking files' content. """
@@ -50,8 +32,6 @@ def validate_file(future):
             return
         if type(cobject.response) == dotdotfarm.engines.http_engine.HttpResponse:
             data = cobject.response.data.decode()
-        elif type(cobject) == WsResponse:
-            data = cobject.response.data
         if not any(map(lambda x: re.match(x, data) != None,
                        dotdotfarm.generators.words_generator.LINUX_FILES_REGEXP + \
                        dotdotfarm.generators.words_generator.WINDOWS_FILES_REGEXP)):
