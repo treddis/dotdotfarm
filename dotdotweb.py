@@ -14,7 +14,7 @@ from dotdotfarm.generators.words_generator import Generator
 from dotdotfarm.engines.http_engine import HTTPEngine
 from dotdotfarm.callbacks.callbacks import print_http_result, add_file, validate_file
 
-VERSION = "1.4.1"
+VERSION = "1.4.2"
 
 argparse_list = partial(str.split, sep=',')
 
@@ -45,14 +45,14 @@ def main():
     # parser.add_argument('-M', '--module-detect', action='store_true', default=False, help='intelligent service detection')
     parser.add_argument('-o', '--os-type', choices=['windows', 'linux'], default='')
     # parser.add_argument('-O', '--os-detect', action='store_true', default=False, help='intelligent OS detection') # TODO: add OS detection mechanisms
-    parser.add_argument('-D', '--depth', type=int, default=5, help='depth of PT searching, default is 5')
-    parser.add_argument('--timeout', type=int, default=60, help='timeout of connections')
+    parser.add_argument('-d', '--depth', type=int, default=5, help='depth of PT searching, default is 5')
+    parser.add_argument('-t', '--timeout', type=int, default=60, help='timeout of connections')
     parser.add_argument('-f', '--file', help='specific file for PT detection')
     parser.add_argument('-R', '--print-files', action='store_true', help='read traversed files')
     parser.add_argument('-fs', type=argparse_list, default=[], help='filter output by size')
     parser.add_argument('-fc', type=argparse_list, default=[], help='filter output by response code')
     parser.add_argument('-H', '--header', dest='headers', default=[], action='append', help='specify header for requests')
-    parser.add_argument('-d', '--data', default='', help='specify POST data')
+    parser.add_argument('--data', default='', help='specify POST data')
     parser.add_argument('-m', '--method', choices=['get', 'post', 'put', 'trace', 'delete'], default='', help='used HTTP method for requests')
     parser.add_argument('url', help='url for testing')
 

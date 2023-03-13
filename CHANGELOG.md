@@ -1,6 +1,13 @@
 # Change log
 All notable changes to this project will be documented in this file
 
+## [[1.4.2] - 2023-03-13]
+### Added
+- proper handling of timeout exceptions
+### Fixed
+- unused websocket library import
+- notation of CLI parameters
+
 ## [[1.4.1] - 2023-02-22]
 ### Fixed
 - entry point in setup.py
