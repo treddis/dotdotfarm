@@ -29,34 +29,6 @@ pip3 install .
 Usage
 =====
 ```bash
-usage: dotdotweb.py [-h] [-o {windows,linux}] [-D DEPTH] [-t TIMEOUT]
-                    [-f FILE] [-R] [-fs FS] [-fc FC] [-H HEADERS] [-d DATA]
-                    [-m {get,post,put,trace,delete}]
-                    url
-
-path traversal identificator & exploit
-
-positional arguments:
-  url                   url for testing
-
-options:
-  -h, --help            show this help message and exit
-  -o {windows,linux}, --os-type {windows,linux}
-  -D DEPTH, --depth DEPTH
-                        depth of PT searching
-  -t TIMEOUT, --timeout TIMEOUT
-                        timeout of connections
-  -f FILE, --file FILE  specific file for PT detection
-  -R, --print-files     read traversed files
-  -fs FS                filter output by size
-  -fc FC                filter output by response code
-  -H HEADERS, --header HEADERS
-                        specify header for requests
-  -d DATA, --data DATA  specify POST data
-  -m {get,post,put,trace,delete}, --method {get,post,put,trace,delete}
-                        used HTTP method for requests
-```
-```bash
 
     .___      __      .___      __    _____
   __| _/_____/  |_  __| _/_____/  |__/ ____\____ _______  _____
