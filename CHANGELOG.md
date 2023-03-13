@@ -1,6 +1,13 @@
 # Change log
 All notable changes to this project will be documented in this file
 
+## [[1.5.0] - 2023-03-13]
+### Added
+- detection mode as default for dotdotweb
+- added delay parameter in CLI & http engine for slowing down requests speed
+### Fixed
+- error while printing files content
+
 ## [[1.4.2] - 2023-03-13]
 ### Added
 - proper handling of timeout exceptions
