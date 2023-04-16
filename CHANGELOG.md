@@ -1,6 +1,12 @@
 # Change log
 All notable changes to this project will be documented in this file
 
+## [[1.5.1] - 2023-04-16]
+### Fixed
+- fixed invalid timeout exception while connection to target is established.
+- removed "--method" parameter because they are calculated automatically.
+- fixed invalid regexp checking for known standart OS files.
+
 ## [[1.5.0] - 2023-03-13]
 ### Added
 - detection mode as default for dotdotweb
