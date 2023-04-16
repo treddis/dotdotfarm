@@ -14,7 +14,7 @@ from dotdotfarm.generators.words_generator import Generator
 from dotdotfarm.engines.http_engine import HTTPEngine
 from dotdotfarm.callbacks.callbacks import print_http_result, add_file, validate_file
 
-VERSION = "1.5.0"
+VERSION = "1.5.1"
 
 argparse_list = partial(str.split, sep=',')
 
@@ -40,10 +40,11 @@ def main():
      {Style.RESET_ALL}""")
 
     parser = argparse.ArgumentParser(description='fast path traversal identificator & exploit')
-    parser.add_argument('-V', '--version', action='version', version=f'dotdotweb {VERSION}', help='print version of the tool')
+    parser.add_argument('--version', action='version', version=f'dotdotweb {VERSION}', help='print version of the tool')
     # parser.add_argument('--debug', action='store_true', help='debug output')
     parser.add_argument('-A', '--all', action='store_true', help='try all files after successfull exploitation (default false)')
     parser.add_argument('-R', '--print-files', action='store_true', help='read traversed files (default false)')
+    parser.add_argument('-V', '--validate', action='store_true', help='validate files\' content after successfull exploitation (default false)')
     # parser.add_argument('-M', '--module-detect', action='store_true', default=False, help='intelligent service detection')
     parser.add_argument('-o', '--os-type', choices=['windows', 'linux'], default='', help='target OS type (default all)')
     parser.add_argument('--delay', type=int, default=0, help='make delays between requests in milliseconds (default 0)')
@@ -52,9 +53,8 @@ def main():
     parser.add_argument('-f', '--file', help='specific file for PT detection')
     parser.add_argument('-fs', type=argparse_list, default=[], help='filter output by size')
     parser.add_argument('-fc', type=argparse_list, default=[], help='filter output by response code')
-    parser.add_argument('-H', '--header', dest='headers', default=[], action='append', help='custom header for requests')
+    parser.add_argument('--header', dest='headers', default=[], action='append', help='custom header for requests')
     parser.add_argument('--data', default='', help='specify POST data')
-    parser.add_argument('-m', '--method', choices=['get', 'post', 'put', 'trace', 'delete'], default='', help='used HTTP method for requests')
     parser.add_argument('url', help='target URL')
 
     opts = parser.parse_args()
@@ -65,10 +65,6 @@ def main():
         opts.fs = list(map(int, opts.fs))
     if opts.fc:
         opts.fc = list(map(int, opts.fc))
-    if opts.data and not opts.method:
-        opts.method = 'post'
-    elif not opts.method:
-        opts.method = 'get'
 
     if 'FUZZ' not in opts.url and 'FUZZ' not in opts.data and not any(map(lambda x: 'FUZZ' in x, opts.headers)):
         parser.error('You must specify FUZZ parameter in URL/Header/Data by example Referer: https://google.com/path?param=FUZZ')
@@ -91,12 +87,14 @@ def main():
     if yarl.URL(opts.url).scheme in ('http', 'https'):
         headers = dict((header.split(': ') for header in opts.headers if header.count('FUZZ') == 0))
 
-        callbacks = [print_http_result, validate_file(not opts.all)]
+        callbacks = [print_http_result]
         if opts.print_files:
             files = {}
             callbacks.append(add_file(files))
+        if opts.validate:
+            callbacks.append(validate_file(not opts.all))
         engine = HTTPEngine(
-            opts.url, opts.method,
+            opts.url,
             headers, opts.data,
             payloads,
             callbacks=callbacks,

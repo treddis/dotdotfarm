@@ -11,6 +11,17 @@ import dotdotfarm.generators.words_generator
 from dotdotfarm.callbacks.cobject import Failed
 
 
+def container(data):
+    def decorator(fn):
+        def wrapper(*args):
+            fn()
+
+        wrapper.attrib = data
+        return wrapper
+
+    return decorator
+
+
 def print_http_result(future):
     """ Basic callback for printing result of request. """
     try:
@@ -18,14 +29,22 @@ def print_http_result(future):
         if cobject.state == Failed:
             return
         if type(cobject.response) == dotdotfarm.engines.http_engine.HttpResponse:
-            tqdm.write(' {:<100}{:>20}'.format(cobject.response.payload,
-                                               f' [Status: {Fore.GREEN}{cobject.response.status}{Style.RESET_ALL}, Size: {len(cobject.response.data)}]'))
+            if cobject.response.status // 100 == 2:
+                tqdm.write(' {:<100}{:>20}'.format(cobject.response.payload,
+                                                   f' [Status: {Fore.GREEN}{cobject.response.status}{Style.RESET_ALL}, Size: {len(cobject.response.data)}]'))
+            elif cobject.response.status // 100 == 5:
+                tqdm.write(' {:<100}{:>20}'.format(cobject.response.payload,
+                                                   f' [Status: {Fore.RED}{cobject.response.status}{Style.RESET_ALL}, Size: {len(cobject.response.data)}]'))
+            elif cobject.response.status // 100 == 4:
+                tqdm.write(' {:<100}{:>20}'.format(cobject.response.payload,
+                                                   f' [Status: {Fore.YELLOW}{cobject.response.status}{Style.RESET_ALL}, Size: {len(cobject.response.data)}]'))
     except:
         return
 
 
 def validate_file(stop_on_success):
     """ Callback used for checking files' content. """
+
     def validate(future):
         try:
             cobject = future.result()
@@ -33,10 +52,12 @@ def validate_file(stop_on_success):
                 return
             if type(cobject.response) == dotdotfarm.engines.http_engine.HttpResponse:
                 data = cobject.response.data.decode()
-            if not any(map(lambda x: re.match(x, data) != None,
-                           dotdotfarm.generators.words_generator.LINUX_FILES_REGEXP + \
-                           dotdotfarm.generators.words_generator.WINDOWS_FILES_REGEXP)):
+                file = cobject.response.file
+
+            if re.match(dotdotfarm.generators.words_generator.FILES_REGEXP[file], data) == None:
                 cobject.state = Failed
+                # future.remove_done_callback(add_file(None))
+                future.cancel()
             elif stop_on_success:
                 for task in asyncio.all_tasks(asyncio.get_event_loop()):
                     task.cancel()
@@ -44,14 +65,18 @@ def validate_file(stop_on_success):
                 pass
         except:
             return
+
     return validate
+
 
 def add_file(files_dict):
     """ Callback used for saving data from response. """
+# @container(files_dict)
     def add(future):
         try:
             cobject = future.result()
-            if cobject.state == Failed:
+            # if cobject.state == Failed:
+            if future.cancelled():
                 return cobject
             if type(cobject.response) == dotdotfarm.engines.http_engine.HttpResponse:
                 data = cobject.response.data.decode()
@@ -59,6 +84,7 @@ def add_file(files_dict):
                 files_dict[cobject.response.url] = data
         except:
             return
+
     return add
 
 

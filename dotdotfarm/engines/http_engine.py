@@ -11,13 +11,13 @@ from colorama import Fore, Style
 
 import dotdotfarm.callbacks.cobject
 
-HttpQuery = namedtuple('HTTP_QUERY', 'type_ value payload')
-HttpResponse = namedtuple('HTTP_RESPONSE', 'url status headers data payload')
+HttpQuery = namedtuple('HTTP_QUERY', 'type_ fuzzed payload file')
+HttpResponse = namedtuple('HTTP_RESPONSE', 'url status headers data payload file')
 
 
 class HTTPEngine:
 
-	def __init__(self, url, method, headers, data, payloads,
+	def __init__(self, url, headers, data, payloads,
 		limit=1000,
 		status_manager=tqdm.asyncio.tqdm,
 		allow_redirects=False,
@@ -27,7 +27,6 @@ class HTTPEngine:
 		filters=None,
 		delay=0):
 		self.url = url
-		self.method = method
 		self.headers = headers
 		self.data = data
 		self.payloads = payloads
@@ -53,23 +52,38 @@ class HTTPEngine:
 	async def run(self):
 		try:
 			async with aiohttp.ClientSession(
-				connector=aiohttp.TCPConnector(limit=self.limit)) as session:
+					connector=aiohttp.TCPConnector(limit=self.limit),
+					timeout=aiohttp.ClientTimeout(sock_connect=self.timeout)) as session:
 				for payload in self.payloads:
 					if payload.type_ == 'url':
 						self.tasks.append(
 							asyncio.create_task(
 								self.request(
-									session, 'get', payload.value, self.headers, self.data, payload.payload)))
+									session, 'GET', payload.fuzzed,
+									headers=self.headers,
+									data=self.data,
+									payload=payload.payload,
+									file=payload.file)))
 					elif payload.type_ == 'header':
 						self.tasks.append(
 							asyncio.create_task(
 								self.request(
-									session, self.method, self.url, payload.value, self.data, payload.payload)))
+									session,
+									'POST' if self.data else 'GET',
+									self.url,
+									headers=payload.fuzzed,
+									data=self.data,
+									payload=payload.payload,
+									file=payload.file)))
 					elif payload.type_ == 'data':
 						self.tasks.append(
 							asyncio.create_task(
 								self.request(
-									session, 'post', self.url, self.headers, payload.value, payload.payload)))
+									session, 'POST', self.url,
+									headers=self.headers,
+									data=payload.fuzzed,
+									payload=payload.payload,
+									file=payload.file)))
 					for callback in self.callbacks:
 						self.tasks[-1].add_done_callback(callback)
 
@@ -77,7 +91,7 @@ class HTTPEngine:
 					await task
 					time.sleep(self.delay)
 
-		except asyncio.CancelledError:
+		except (asyncio.CancelledError, KeyboardInterrupt):
 			pass
 		except asyncio.TimeoutError:
 			print(f'[{Fore.RED}-{Style.RESET_ALL}] Timeout occurred')
@@ -91,17 +105,18 @@ class HTTPEngine:
 			for task in self.tasks:
 				task.cancel()
 
-	async def request(self, session, method, url, headers, data, used_payload):
+	async def request(self, session, method, url, *,
+					  headers, data, payload,
+					  file):
 		url = yarl.URL(url, encoded=True)
 		try:
 			async with session.request(method, url,
 									   headers=headers, data=data,
 									   verify_ssl=self.verify_ssl,
-									   allow_redirects=self.allow_redirects,
-									   timeout=self.timeout) as response:
+									   allow_redirects=self.allow_redirects) as response:
 				text = await response.read()
 				url = str(url)
-				resp = HttpResponse(url, response.status, response.headers, text, used_payload)
+				resp = HttpResponse(url, response.status, response.headers, text, payload, file)
 				return self.filtered(resp)
 		except asyncio.TimeoutError:
 			raise
@@ -115,6 +130,8 @@ class HTTPEngine:
 			# return HttpResponse(url, None, None, None, None)
 		except ConnectionResetError:
 			return
+		except KeyboardInterrupt:
+			raise
 		except BaseException:
 			return
 

@@ -1,7 +1,7 @@
 dotdotfarm
 ==========
 
-![Version](https://img.shields.io/badge/version-1.5.0-blue?style=for-the-badge)
+![Version](https://img.shields.io/badge/version-1.5.1-blue?style=for-the-badge)
 
 Utility for detection & exploitation of Path Traversal vulnerabilities in various network services
 

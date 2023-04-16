@@ -7,15 +7,18 @@ from dotdotfarm.engines.http_engine import HttpQuery
 # Payload = namedtuple('PAYLOAD', 'type_ value payload')
 
 WINDOWS_FILES = ['Windows|win.ini', 'Windows|System32|drivers|etc|hosts']
-WINDOWS_FILES_REGEXP = [
-	'.*for 16-bit app support.*',
-	'^[^"]+This is a sample HOSTS file used by Microsoft TCP/IP for Windows[^"]*$']
 LINUX_FILES = ['etc|passwd', 'etc|issue', 'etc|hosts', 'etc|group']
-LINUX_FILES_REGEXP = [
-	'(.*:){6}',
-	'.*\n \\\l.*',
-	'127.0.0.1\\s+localhost',
-	'(.*:){3}']
+
+FILES_REGEXP = {
+	LINUX_FILES[0]: '(.*:){6}',
+	LINUX_FILES[1]: '.*\n \\\l.*',
+	LINUX_FILES[2]: '127.0.0.1\\s+localhost',
+	LINUX_FILES[3]: '(.*:){3}',
+
+	WINDOWS_FILES[0]: '.*for 16-bit app support.*',
+	WINDOWS_FILES[1]: '^[^"]+This is a sample HOSTS file used by Microsoft TCP/IP for Windows[^"]*$'
+}
+
 DOTS = [
 	'..',
 	'.%00.',
@@ -91,20 +94,4 @@ class Generator:
 							for input_ in inp_list:
 								payload = (dot + slash) * i + file.replace('|', slash)
 								fuzzed = input_.replace('FUZZ', payload)
-								yield HttpQuery(type_, fuzzed, payload)
-
-	def get_payloads_ws(self):
-		for type_, inp_list in self.inputs.items():
-			for file in self.files:
-				for dot in self.dots:
-					for slash in self.slashes:
-						for i in range(1, self.depth + 1):
-							for input_ in inp_list:
-								fuzzed = []
-								if 'FUZZ' in input_:
-									payload = (dot + slash) * i + file.replace('|', slash)
-									fuzzed.append(input_.replace('FUZZ', payload))
-								else:
-									fuzzed.append(input_)
-
-							yield WsQuery(type_, fuzzed, payload)
+								yield HttpQuery(type_, fuzzed, payload, file)

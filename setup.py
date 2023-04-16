@@ -22,7 +22,7 @@ try:
         os.symlink(install_dir + '/dotdotweb.py', install_dir + '/dotdotfarm/dotdotweb.py')
         setup(
         name='dotdotfarm',
-        version='1.5.0',
+        version='1.5.1',
         description='Path Traversal exploitation tool',
         license='GPL',
         author='treddis',
