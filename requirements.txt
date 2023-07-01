@@ -1,4 +1,4 @@
-aiohttp==3.8.3
+aiohttp==3.8.4
 colorama==0.4.6
 setuptools==66.1.1
 tqdm==4.64.1

@@ -19,6 +19,11 @@ Features
 
 Installation
 ============
+Install from PyPi
+```bash
+pip install dotdotfarm
+```
+You can also install it directly from GitHub repository
 ```bash
 git clone https://github.com/treddis/dotdotfarm.git
 cd dotdotfarm
@@ -30,16 +35,17 @@ Usage
 =====
 ```bash
 
-    .___      __      .___      __    _____
-  __| _/_____/  |_  __| _/_____/  |__/ ____\____ _______  _____
- / __ |/  _ \   __\/ __ |/  _ \   __\   __\\__  \\_  __ \/     \
+    .___      __      .___      __    _____                      
+  __| _/_____/  |_  __| _/_____/  |__/ ____\____ _______  _____  
+ / __ |/  _ \   __\/ __ |/  _ \   __\   __\\__  \\_  __ \/     \ 
 / /_/ (  <_> )  | / /_/ (  <_> )  |  |  |   / __ \|  | \/  Y Y  \
 \____ |\____/|__| \____ |\____/|__|  |__|  (____  /__|  |__|_|  /
-     \/                \/                       \/            \/
-
-usage: dotdotweb.py [-h] [-V] [-A] [-R] [-o {windows,linux}] [--delay DELAY] [-d DEPTH] [-t TIMEOUT] [-f FILE]
-                    [-fs FS] [-fc FC] [-H HEADERS] [--data DATA] [-m {get,post,put,trace,delete}]
-                    url
+     \/                \/                       \/            \/ 
+     
+usage: dotdotweb [-h] [--version] [-V] [-A] [-R] [-o {windows,linux}]
+                 [-d DEPTH] [-f FILE] [--delay DELAY]
+                 [-t TIMEOUT] [-fs FS] [-fc FC] [--header HEADERS] [--data DATA]
+                 url
 
 fast path traversal identificator & exploit
 
@@ -48,24 +54,24 @@ positional arguments:
 
 options:
   -h, --help            show this help message and exit
-  -V, --version         print version of the tool
-  -A, --all             try all files after successfull exploitation (default false)
+  --version             print version of the tool
+  -V, --validate        validate files' content after successfull exploitation
+                            (default false)
+  -A, --all             try all files after successfull exploitation
+                            (default false)
   -R, --print-files     read traversed files (default false)
   -o {windows,linux}, --os-type {windows,linux}
                         target OS type (default all)
-  --delay DELAY         make delays between requests in milliseconds (default 0)
   -d DEPTH, --depth DEPTH
                         depth of PT searching (default 5)
+  -f FILE, --file FILE  specific file for PT detection
+  --delay DELAY         make delays between requests in milliseconds (default 0)
   -t TIMEOUT, --timeout TIMEOUT
                         timeout of connections (default 60)
-  -f FILE, --file FILE  specific file for PT detection
   -fs FS                filter output by size
   -fc FC                filter output by response code
-  -H HEADERS, --header HEADERS
-                        custom header for requests
+  --header HEADERS      custom header for requests
   --data DATA           specify POST data
-  -m {get,post,put,trace,delete}, --method {get,post,put,trace,delete}
-                        used HTTP method for requests
 ```
 
 Passing in GET parameters
@@ -133,11 +139,3 @@ dotdotweb -o windows "http://localhost:8080/pathtrav?query=FUZZ"
 100%|██████████████████████████████████████████████████████████| 6960/6960 [00:12<00:00, 575.63it/s]
 [*] Ended at Sun Jan 22 19:32:58 2023 (11 seconds)
 ```
-
-Limitations
-===========
-- Python 3.8+
-- ~~High speed of requests rate can trigger WAF of you target~~
-- Unable to pass own dictionary for payload generator
-- No way to flexibly forge payloads
-- ~~Need of OS specifying~~
