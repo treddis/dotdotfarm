@@ -5,7 +5,11 @@ import os
 import shutil
 from setuptools import setup, find_packages
 
-__version__ = '1.5.1'
+from pathlib import Path
+this_directory = Path(__file__).parent
+long_description = (this_directory / "README.md").read_text()
+
+__version__ = '1.5.2'
 install_requires = [
     "aiohttp==3.8.4",
     "colorama==0.4.6",

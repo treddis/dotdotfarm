@@ -54,6 +54,16 @@ class HTTPEngine:
 			async with aiohttp.ClientSession(
 					connector=aiohttp.TCPConnector(limit=self.limit),
 					timeout=aiohttp.ClientTimeout(sock_connect=self.timeout)) as session:
+
+				# Check if server is available
+				try:
+					async with session.get(self.url) as response:
+						pass
+				except aiohttp.client_exceptions.ClientConnectorError as e:
+					print(f'[{Fore.RED}-{Style.RESET_ALL}] Connection error: {e.strerror}')
+					await aiohttp.TCPConnector().close()
+					return
+
 				for payload in self.payloads:
 					if payload.type_ == 'url':
 						self.tasks.append(

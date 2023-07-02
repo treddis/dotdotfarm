@@ -1,6 +1,10 @@
 # Change log
 All notable changes to this project will be documented in this file
 
+## [[1.5.2] - 2023-07-02]
+### Fixed
+- fixed continuous requests after timeout/refused connection
+
 ## [[1.5.1] - 2023-04-16]
 ### Fixed
 - fixed invalid timeout exception while connection to target is established.

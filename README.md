@@ -1,7 +1,7 @@
 dotdotfarm
 ==========
 
-![Version](https://img.shields.io/badge/version-1.5.1-blue?style=for-the-badge)
+![Version](https://img.shields.io/badge/version-1.5.2-blue?style=for-the-badge)
 
 Utility for detection & exploitation of Path Traversal vulnerabilities in various network services
 
@@ -33,7 +33,7 @@ pip3 install .
 
 Usage
 =====
-```bash
+```text
 
     .___      __      .___      __    _____                      
   __| _/_____/  |_  __| _/_____/  |__/ ____\____ _______  _____  

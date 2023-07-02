@@ -14,7 +14,7 @@ from dotdotfarm.generators.words_generator import Generator
 from dotdotfarm.engines.http_engine import HTTPEngine
 from dotdotfarm.callbacks.callbacks import print_http_result, add_file, validate_file
 
-__version__ = "1.5.1"
+__version__ = '1.5.2'
 
 argparse_list = partial(str.split, sep=',')
 
