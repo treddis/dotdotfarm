@@ -10,7 +10,8 @@ WINDOWS_FILES = ['Windows|win.ini', 'Windows|System32|drivers|etc|hosts']
 LINUX_FILES = ['etc|passwd', 'etc|issue', 'etc|hosts', 'etc|group']
 
 FILES_REGEXP = {
-	LINUX_FILES[0]: '(.*:){6}',
+	# LINUX_FILES[0]: '(.*:){6}',
+	LINUX_FILES[0]: '[\w-]+:(x|\w)+:\d+:\d+:.*:[/a-zA-Z0-9-]+:[/a-zA-Z0-9-]+',
 	LINUX_FILES[1]: '.*\n \\\l.*',
 	LINUX_FILES[2]: '127.0.0.1\\s+localhost',
 	LINUX_FILES[3]: '(.*:){3}',
