@@ -22,6 +22,7 @@ FILES_REGEXP = {
 
 DOTS = [
 	'..',
+	'%2e%2e',  # URL encoding
 	'.%00.',
 	'..%00',
 	'..%01',
@@ -31,11 +32,10 @@ DOTS = [
 	'%2e.',
 	'.../.',
 	'..../',
-	'%2e%2e',
 	'%%c0%6e%c0%6e',
 	'0x2e0x2e',
 	'%c0.%c0.',
-	'%252e%252e',  # double URL encoding: ..
+	'%252e%252e',  # double URL encoding
 	'%c0%2e%c0%2e',
 	'%c0%ae%c0%ae',
 	'%c0%5e%c0%5e',
