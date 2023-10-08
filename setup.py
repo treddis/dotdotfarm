@@ -9,7 +9,7 @@ from pathlib import Path
 this_directory = Path(__file__).parent
 long_description = (this_directory / "README.md").read_text()
 
-__version__ = '1.5.2'
+__version__ = '1.6.0'
 install_requires = [
     "aiohttp==3.8.4",
     "colorama==0.4.6",
