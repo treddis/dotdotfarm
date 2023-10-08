@@ -8,8 +8,11 @@ class CallbackObjectState:
 class Passing(CallbackObjectState):
     pass
 
-
 class Failed(CallbackObjectState):
+    pass
+
+
+class FailedCallback(Exception):
     pass
 
 

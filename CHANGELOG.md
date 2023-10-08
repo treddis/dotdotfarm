@@ -1,36 +1,46 @@
 # Change log
-All notable changes to this project will be documented in this file
+All notable changes to this project will be documented in this file.
 
-## [[1.5.2] - 2023-07-02]
+## v1.6.0 - 2023-09-25
+### Added
+- Modified HTTP engine for mor instantly starting
+- Added argument groups in help
+- More readable output
+### Fixed
+- Fixed known files regex for proper PT validation
+- Fixed delay between requests
+- Fixed inconsistent callbacks working
+
+## v1.5.2 - 2023-07-02
 ### Fixed
 - fixed continuous requests after timeout/refused connection
 
-## [[1.5.1] - 2023-04-16]
+## v1.5.1 - 2023-04-16
 ### Fixed
 - fixed invalid timeout exception while connection to target is established.
 - removed "--method" parameter because they are calculated automatically.
-- fixed invalid regexp checking for known standart OS files.
+- fixed invalid regexp checking for known standard OS files.
 
-## [[1.5.0] - 2023-03-13]
+## v1.5.0 - 2023-03-13
 ### Added
 - detection mode as default for dotdotweb
 - added delay parameter in CLI & http engine for slowing down requests speed
 ### Fixed
 - error while printing files content
 
-## [[1.4.2] - 2023-03-13]
+## v1.4.2 - 2023-03-13
 ### Added
 - proper handling of timeout exceptions
 ### Fixed
 - unused websocket library import
 - notation of CLI parameters
 
-## [[1.4.1] - 2023-02-22]
+## v1.4.1 - 2023-02-22
 ### Fixed
 - entry point in setup.py
 - valid structure of callbacks module
 
-## [[1.4.0] - 2023-02-18]
+## v1.4.0 - 2023-02-18
 ### Added
 - version via --version parameter
 - version to README
@@ -40,7 +50,7 @@ All notable changes to this project will be documented in this file
 ### Fixed
 - typo in README & CHANGELOG
 
-## [[1.3.0] - 2023-01-27] BETA
+## v1.3.0 (BETA) - 2023-01-27
 ### Added
 - testing of all available files for windows and linux by default, thus closing the limitation of OS type requirement
 - added a default timeout of 60 seconds
@@ -48,25 +58,25 @@ All notable changes to this project will be documented in this file
 - README typo
 - project tree
 
-## [[1.2.0] - 2023-01-23] BETA
+## v1.2.0 (BETA) - 2023-01-23
 ### Added
 - Features to README
 - Fixed TQDM status bar
 - Reading of files after succeeding the payload
 
-## [[1.1.0] - 2023-01-22] BETA
+## v1.1.0 (BETA) - 2023-01-22
 ### Added
 - limitations of the tool to README
 ### Fixed
 - typo in README
 
-## [[1.0.0] - 2023-01-22] BETA
+## v1.0.0 (BETA) - 2023-01-22
 ### Added
 - support of setup.py
 - project as package
 - callbacks for requests
 
-## [[0.3.0] - 2023-01-18] ALPHA
+## v0.3.0 (ALPHA) - 2023-01-18
 ### Added
 - support for attacks via HTTP headers
 - status bar (tqdm) for monitoring results
@@ -74,7 +84,7 @@ All notable changes to this project will be documented in this file
 ### Fixed
 - invalid handling of input for payloads generator
 
-## [[0.2.0] - 2023-01-17] ALPHA
+## v0.2.0 (ALPHA) - 2023-01-17
 ### Added
 - first view of project structure
 - TODO comments
@@ -85,11 +95,11 @@ All notable changes to this project will be documented in this file
 - more informative output
 - acceleration via increasing of available simultaneous TCP connections
 ### Fixed
-- added handlers for graceful shutdown of coroutins after receiving reset&timeout errors
+- added handlers for graceful shutdown of coroutines after receiving reset&timeout errors
 
-## [[0.1.1] - 2023-01-16] ALPHA
+## v0.1.1 (ALPHA) - 2023-01-16
 ### Fixed
 - updating README
 
-## [[0.1.0] - 2023-01-16] ALPHA
+## v0.1.0 (ALPHA) - 2023-01-16
 - initial commit

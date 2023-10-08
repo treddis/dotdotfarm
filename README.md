@@ -1,7 +1,7 @@
 dotdotfarm
 ==========
 
-![Version](https://img.shields.io/badge/version-1.5.2-blue?style=for-the-badge)
+![Version](https://img.shields.io/badge/version-1.6.0-blue?style=for-the-badge)
 
 Utility for detection & exploitation of Path Traversal vulnerabilities in various network services
 
@@ -77,7 +77,7 @@ options:
 Passing in GET parameters
 ----------------------
 Passing brute parameters via `?par=val` pairs:
-```bash
+```text
 dotdotweb -o windows -fc 500 \ 
           http://someserver.com:1280/newpath?testparameter=FUZZ&secondparameter=somevalue
 ```
@@ -85,7 +85,7 @@ dotdotweb -o windows -fc 500 \
 Passing via headers
 -------------------
 Passing brute parameters via `Origin: master=FUZZ` pairs:
-```bash
+```text
 dotdotweb -o linux -fc 500,404 -H "Referer: https://www.google.com/path?q=FUZZ" \
           http://someserver.com:1280/newpath?testparameter=firstvalue&secondparameter=somevalue
 ```
@@ -93,14 +93,14 @@ dotdotweb -o linux -fc 500,404 -H "Referer: https://www.google.com/path?q=FUZZ" 
 Passing via POST data
 ---------------------
 Passing brute parameters via POST data parameters
-```bash
+```text
 dotdotweb -o linux -fc 500 -fs 111 -d "key0=val0&key1=val1" \
           http://someserver.com:1280/newpath?testparameter=firstvalue&secondparameter=somevalue
 ```
 
 Example output
 ==============
-```bash
+```text
 dotdotweb -o windows "http://localhost:8080/pathtrav?query=FUZZ" 
 
     .___      __      .___      __    _____
