@@ -9,7 +9,7 @@ from pathlib import Path
 this_directory = Path(__file__).parent
 long_description = (this_directory / "README.md").read_text()
 
-__version__ = '1.7.1'
+__version__ = '1.7.2'
 install_requires = [
     "aiohttp~=3.9.3",
     'tqdm>=4.64.1',
@@ -22,6 +22,7 @@ install_requires = [
     "yarl",
     "async-timeout",
     "aiosignal"
+    "aiohttp-socks"
 ]
 
 install_dir = os.path.abspath('.')

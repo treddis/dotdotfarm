@@ -1,0 +1,45 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = 'dotdotfarm'
+description = 'Fast Path Traversal exploitation tool'
+version = '1.7.2'
+#dynamic = ["version"]
+dependencies = [
+    "aiohttp==3.9.5",
+    "aiohttp_socks==0.8.4",
+    "aiosignal==1.3.1",
+    "async-timeout==4.0.3",
+    "attrs==23.2.0",
+    "blinker==1.7.0",
+    "click==8.1.7",
+    "colorama==0.4.6",
+    "flask==3.0.3",
+    "frozenlist==1.4.1",
+    "idna==3.7",
+    "itsdangerous==2.2.0",
+    "jinja2==3.1.3",
+    "markupsafe==2.1.5",
+    "multidict==6.0.5",
+    "python-socks[asyncio]==2.4.4",
+    "tqdm==4.64.1",
+    "websockets==12.0",
+    "werkzeug==3.0.2",
+    "yarl==1.9.4"
+]
+authors = [
+    {name = "treddis"}
+]
+readme = 'README.md'
+license = {text = "GPLv3 license"}
+keywords = ['path-traversal', 'fuzzer', 'appsec', 'lfi', 'security', 'web', 'pentesting']
+
+[project.urls]
+Homepage = 'https://github.com/treddis/dotdotfarm'
+Repository = 'https://github.com/treddis/dotdotfarm.git'
+Changelog = 'https://github.com/treddis/dotdotfarm/blob/master/CHANGELOG.md'
+
+[project.scripts]
+dotdotweb = 'dotdotfarm.dotdotweb:main'
