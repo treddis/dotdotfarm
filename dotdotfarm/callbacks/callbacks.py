@@ -38,6 +38,8 @@ def print_http_result(future):
             elif cobject.response.status // 100 == 4:
                 tqdm.write(' {:<100}{:>20}'.format(cobject.response.payload,
                                                    f' [Status: {Fore.YELLOW}{cobject.response.status}{Style.RESET_ALL}, Size: {len(cobject.response.data)}]'))
+    except KeyboardInterrupt:
+        raise asyncio.CancelledError
     except:
         pass
 
@@ -68,6 +70,10 @@ def validate_file(stop_on_success):
                 pass
         except AttributeError:
             pass
+        except KeyboardInterrupt:
+            raise asyncio.CancelledError
+        except:
+            pass
 
     return validate
 
@@ -86,6 +92,8 @@ def add_file(files_dict):
                 data = cobject.response.data.decode()
             if data not in files_dict.values():
                 files_dict[cobject.response.url] = data
+        except KeyboardInterrupt:
+            raise asyncio.CancelledError
         except:
             pass
 

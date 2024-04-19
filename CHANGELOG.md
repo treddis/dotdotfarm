@@ -1,6 +1,15 @@
 # Change log
 All notable changes to this project will be documented in this file.
 
+
+## v1.7.1 - 2024-04-19
+### Added
+- Regex for filter parameters
+- Proxy support
+### Fixed
+- output flood while stopping program (KeyboardInterrupt)
+- some exceptions
+
 ## v1.6.0 - 2023-09-25
 ### Added
 - Modified HTTP engine for mor instantly starting

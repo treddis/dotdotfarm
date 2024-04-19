@@ -2,8 +2,10 @@
 #! -*- coding: utf-8 -*-
 
 import argparse
-import logging
+# import logging
 import asyncio
+import re
+
 import yarl
 import time
 from functools import partial
@@ -14,20 +16,20 @@ from dotdotfarm.generators.words_generator import Generator
 from dotdotfarm.engines.http_engine import HTTPEngine
 from dotdotfarm.callbacks.callbacks import print_http_result, add_file, validate_file
 
-__version__ = '1.6.0'
+__version__ = '1.7.1'
 
 argparse_list = partial(str.split, sep=',')
 
 async def factory(engine):
     try:
-        task = asyncio.create_task(engine.run())
+        task = asyncio.get_running_loop().create_task(engine.run())
         await task
     except asyncio.CancelledError:
         task.cancel()
     except ConnectionResetError:
         pass
-    except BaseException:
-        pass
+    except BaseException as e:
+        print(e)
 
 def main():
     print(f"""{Fore.CYAN}
@@ -41,9 +43,10 @@ def main():
 
     parser = argparse.ArgumentParser(description='fast path traversal identificator & exploit')
     parser.add_argument('--version', action='version', version=f'dotdotweb {__version__}', help='print version of the tool')
+    parser.add_argument('--proxy', default='', help='specify proxy to test selected url')
 
     # Callbacks
-    callbacks = parser.add_argument_group('Callbacks', '')
+    callbacks = parser.add_argument_group('Callbacks')
     callbacks.add_argument('-V', '--validate', action='store_true', help='validate files\' content after successfull exploitation (default false)')
     # parser.add_argument('-v', '--verbose', action='store_true', help='verbose output of responses')
     # parser.add_argument('--debug', action='store_true', help='debug output')
@@ -52,7 +55,7 @@ def main():
     # parser.add_argument('-M', '--module-detect', action='store_true', default=False, help='intelligent service detection')
 
     # Parameters for payload generator
-    generator = parser.add_argument_group('Payload parameters')
+    generator = parser.add_argument_group('Payload generator parameters')
     generator.add_argument('-o', '--os-type', choices=['windows', 'linux'], default='', help='target OS type (default all)')
     generator.add_argument('-d', '--depth', type=int, default=5, help='depth of PT searching (default 5)')
     generator.add_argument('-f', '--file', help='specific file for PT detection')
@@ -63,8 +66,8 @@ def main():
 
     # Filters
     filters = parser.add_argument_group('Filters')
-    filters.add_argument('-fs', type=argparse_list, default=[], help='filter output by size')
-    filters.add_argument('-fc', type=argparse_list, default=[], help='filter output by response code')
+    filters.add_argument('-fs', type=argparse_list, default=[], help='filter output by size (with quantifiers)')
+    filters.add_argument('-fc', type=argparse_list, default=[], help='filter output by response code (with quantifiers)')
 
     # Payload specificators
     locations = parser.add_argument_group('Payload locations')
@@ -78,9 +81,19 @@ def main():
     #     logging.getLogger("asyncio").setLevel(logging.WARNING)
 
     if opts.fs:
-        opts.fs = list(map(int, opts.fs))
+        if not all(map(lambda x: re.match(r'[0-9\*\?]+', x), opts.fs)):
+            parser.error('Invalid -fs parameter')
+        else:
+            opts.fs = list(map(lambda x: x.replace("*", "\\d*").replace("?", "\\d?"), opts.fs))
     if opts.fc:
-        opts.fc = list(map(int, opts.fc))
+        if not all(map(lambda x: re.match(r'[0-9\*\?]+', x), opts.fc)):
+            parser.error('Invalid -fc parameter')
+        else:
+            opts.fc = list(map(lambda x: x.replace("*", "\\d*").replace("?", "\\d?"), opts.fc))
+    if opts.proxy:
+        if not re.match(r'^(socks(5|4)|https?)://(\S+:\S+@)?(([0-9]\.){3}[0-9]{1,3}|[a-zA-Z0-9-.]{1,255})(:\d+)?\/?$', opts.proxy):
+            parser.error('Invalid --proxy parameter')
+        # opts.fc = list(map(int, opts.fc))
 
     if 'FUZZ' not in opts.url and 'FUZZ' not in opts.data and not any(map(lambda x: 'FUZZ' in x, opts.headers)):
         parser.error('You must specify FUZZ parameter in URL/Header/Data by example Referer: https://google.com/path?param=FUZZ')
@@ -117,11 +130,12 @@ def main():
             callbacks=callbacks,
             filters=(opts.fc, opts.fs),
             timeout=opts.timeout,
-            rate=opts.rate)
+            rate=opts.rate,
+            proxy=opts.proxy)
 
         task = loop.create_task(factory(engine))
     else:
-        parser.error('Not implemented')
+        parser.error('This URL scheme is not implemented yet')
 
     try:
         start = time.time()

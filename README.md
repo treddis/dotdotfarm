@@ -1,7 +1,7 @@
 dotdotfarm
 ==========
 
-![Version](https://img.shields.io/badge/version-1.6.0-blue?style=for-the-badge)
+![Version](https://img.shields.io/badge/version-1.7.1-blue?style=for-the-badge)
 
 Utility for detection & exploitation of Path Traversal vulnerabilities in various network services
 
@@ -11,11 +11,11 @@ dotdotweb - PT tool for HTTP services
 Tools are written in Python with using asyncio requests (aiohttp) with some acceleration techniques, which allows you to make up to ~3K requests per second
 
 Features
-========
-- async client for parallel requesting of target (speedup)
+--------
+- using asynchronous requests for increasing scan of target
 - ability to fetch files' content after succeeding a payload
-- specifying payload in any part of query (url, headers or POST data)
-- using callbacks for future handling of results
+- specifying payload in any part of query (URL, headers or POST data)
+- using callbacks for handling of results
 
 Installation
 ============
@@ -27,8 +27,11 @@ You can also install it directly from GitHub repository
 ```bash
 git clone https://github.com/treddis/dotdotfarm.git
 cd dotdotfarm
-pip install -r requirements.txt
 pip3 install .
+```
+To upgrade tool run
+```bash
+pip install --upgrade dotdotfarm
 ```
 
 Usage
@@ -74,29 +77,39 @@ options:
   --data DATA           specify POST data
 ```
 
-Passing in GET parameters
-----------------------
+### Passing payload in GET parameters
 Passing brute parameters via `?par=val` pairs:
 ```text
 dotdotweb -o windows -fc 500 \ 
           http://someserver.com:1280/newpath?testparameter=FUZZ&secondparameter=somevalue
 ```
 
-Passing via headers
--------------------
+### Passing payload in headers
 Passing brute parameters via `Origin: master=FUZZ` pairs:
 ```text
 dotdotweb -o linux -fc 500,404 -H "Referer: https://www.google.com/path?q=FUZZ" \
           http://someserver.com:1280/newpath?testparameter=firstvalue&secondparameter=somevalue
 ```
 
-Passing via POST data
----------------------
+### Passing payload in POST data
 Passing brute parameters via POST data parameters
 ```text
 dotdotweb -o linux -fc 500 -fs 111 -d "key0=val0&key1=val1" \
           http://someserver.com:1280/newpath?testparameter=firstvalue&secondparameter=somevalue
 ```
+
+### Using regexp to filter responses
+Pass -fs (filter by size) or -fc (filter by status code) to filter out not related responses
+```text
+dotdotweb -fc 50*,4* -fs 18??,1834* http://someserver.com:1234/testpath/FUZZ
+```
+
+### Launch callbacks on responses
+You can launch callbacks on your responses to perform some check or make other actions.
+In the box implemented callbacks:
+- validate response content using regexp and print then (-V). You can pass your regexp too!
+- try all payloads even entry point is found (-A)
+- read traversed files content and print them on screen (-P)
 
 Example output
 ==============
